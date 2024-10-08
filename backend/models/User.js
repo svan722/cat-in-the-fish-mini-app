@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
   lastname: { type: String, default: '' },
   inviter: { type: String, default: '' },
   isPremium: { type: Boolean, default: false },
+
   walletConnected: { type: Boolean, default: false },
   telegramChannelJoined: { type: Boolean, default: false },
   telegramGroupJoined: { type: Boolean, default: false },
@@ -19,18 +20,12 @@ const UserSchema = new mongoose.Schema({
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   role: { type: String, enum: ['admin', 'user'], default: 'user' },
   
-  token: { type: Number, default: 0 },
-  onion: { type: Number, default: 0 },
+  ticket: { type: Number, default: 1 },
+  fish: { type: Number, default: 0 },
+
   totalScore: { type: Number, default: 0 },
   weeklyScore: { type: Number, default: 0 },
   monthlyScore: { type: Number, default: 0 },
-  
-  energy: { type: Number, default: 1000 },
-  maxEnergy: { type: Number, default: 1000 },
-  loseEnergyPerTap: { type: Number, default: 10 },
-  addEnergyPerSecond: { type: Number, default: 1 },
-  lastEnergyUpdate: { type: Date, default: Date.now },
-  earnPerTap: { type: Number, default: 1 },
 
   lastRewardDate: { type: Date },
   rewardStreak: { type: Number, default: 0 },
@@ -41,36 +36,9 @@ const UserSchema = new mongoose.Schema({
   }],
 });
 
-// Method to update energy based on elapsed time since last update
-UserSchema.methods.updateEnergy = async function() {
-  const now = Date.now();
-  const secondsElapsed = Math.floor((now - this.lastEnergyUpdate) / 1000);
-  
-  if (secondsElapsed > 0) {
-    var addValue = await this.calcEnergyInc();
-    const energyGain = addValue * secondsElapsed;
-    this.energy = Math.min(this.energy + energyGain, this.maxEnergy);
-    this.lastEnergyUpdate = now;
-    return this.save(); // Save the changes to the database
-  }
-  return Promise.resolve(); // No time has elapsed
-};
-
-// Calc add energy per second
-UserSchema.methods.calcEnergyInc = async function() {
-  var value = this.addEnergyPerSecond;
-  const currentTime = new Date();
-  for (const boost of this.boosts) {
-    if (currentTime < boost.endTime) {
-      return value * 2;
-    }
-  }
-  return value;
-};
-
-// Method to add onion with totalScore, weeklyScore, monthlyScore
-UserSchema.methods.addOnion = async function(value) {
-  this.onion += value;
+// Method to add fish with totalScore, weeklyScore, monthlyScore
+UserSchema.methods.addFish = async function(value) {
+  this.fish += value;
   this.totalScore += value;
   this.weeklyScore += value;
   this.monthlyScore += value;

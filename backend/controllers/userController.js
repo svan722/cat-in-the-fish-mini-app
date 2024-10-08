@@ -14,7 +14,6 @@ const { isUserTGJoined } = require('../helper/botHelper');
 const getUser = async (req, res) => {
   const { userid } = req.params;
   const user = await User.findOne({ userid });
-  await user.updateEnergy();
   res.status(StatusCodes.OK).json(user);
 }
 
@@ -43,10 +42,10 @@ const connectWallet = async (req, res) => {
     }
     user.walletConnected = true;
     const bonus = BONUS.WALLET_CONNECT;
-    user.addOnion(bonus);
+    user.addFish(bonus);
 
     await user.save();
-    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received wallet connect bonus', onion: user.onion, bonus: bonus});
+    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received wallet connect bonus', fish: user.fish, bonus: bonus});
   }
   return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no userid!'});
 }
@@ -71,10 +70,10 @@ const joinTelegram = async (req, res) => {
       bonus = BONUS.JOIN_TG_GROUP;
       user.telegramGroupJoined = true;
     }
-    user.addOnion(bonus);
+    user.addFish(bonus);
 
     await user.save();
-    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received telegram joined bonus', onion: user.onion, bonus: bonus});
+    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received telegram joined bonus', fish: user.fish, bonus: bonus});
   }
   return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'there is no userid!'});
 };
@@ -100,10 +99,10 @@ const followX = async (req, res) => {
   await follow.save();
 
   user.xFollowed = true;
-  user.addOnion(BONUS.FOLLOW_X_ACCOUNT);
+  user.addFish(BONUS.FOLLOW_X_ACCOUNT);
 
   await user.save();
-  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received follow X bonus', onion: user.onion, bonus: BONUS.FOLLOW_X_ACCOUNT});
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received follow X bonus', fish: user.fish, bonus: BONUS.FOLLOW_X_ACCOUNT});
 };
 
 const retweet = async (req, res) => {
@@ -123,16 +122,16 @@ const retweet = async (req, res) => {
 
   var follow = await Follow.findOne({ userid, platform: 'Tweet' });
   if(!follow) {
-    return res.status(StatusCodes.OK).json({success: false, status: 'nofollow', msg: 'Not tweet @Onion yet!'});
+    return res.status(StatusCodes.OK).json({success: false, status: 'nofollow', msg: 'Not tweet X yet!'});
   }
   follow.username = username;
   await follow.save();
 
   user.xTweet = true;
-  user.addOnion(BONUS.RETWEET_POST);
+  user.addFish(BONUS.RETWEET_POST);
 
   await user.save();
-  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received visit website bonus', onion: user.onion, bonus: BONUS.RETWEET_POST});
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received visit website bonus', fish: user.fish, bonus: BONUS.RETWEET_POST});
 };
 
 const subscribe_youtube = async (req, res) => {
@@ -159,10 +158,10 @@ const subscribe_youtube = async (req, res) => {
   await follow.save();
 
   user.youtubeSubscribed = true;
-  user.addOnion(BONUS.SUBSCRIBE_YOUTUBE);
+  user.addFish(BONUS.SUBSCRIBE_YOUTUBE);
 
   await user.save();
-  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received subscribe youtube bonus', onion: user.onion, bonus: BONUS.SUBSCRIBE_YOUTUBE});
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received subscribe youtube bonus', fish: user.fish, bonus: BONUS.SUBSCRIBE_YOUTUBE});
 };
 
 const visit_website = async (req, res) => {
@@ -192,10 +191,10 @@ const visit_website = async (req, res) => {
   await follow.save();
 
   user.visitWebSite = true;
-  user.addOnion(BONUS.VISIT_WEBSITE);
+  user.addFish(BONUS.VISIT_WEBSITE);
 
   await user.save();
-  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received visit website bonus', onion: user.onion, bonus: BONUS.VISIT_WEBSITE});
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received visit website bonus', fish: user.fish, bonus: BONUS.VISIT_WEBSITE});
 };
 
 const follow_task_do = async (req, res) => {
@@ -243,7 +242,7 @@ const claimDailyReward = async (req, res) => {
 
     var status = 'notyet';
     if (timeSinceLastReward >= oneDay) {
-      user.addOnion(reward);
+      user.addFish(reward);
       user.lastRewardDate = now;
       if(req.body.status == 1) {
         await user.save();
@@ -288,44 +287,6 @@ const getLeaderboard = async (req, res) => {
   } catch(error){
     console.log("getLeaderboard error=", error);
   }
-}
-
-const updateUserByTap = async (req,res) =>{
-  const {userid} = req.body;
-  var user = await User.findOne({userid}).select('-password');
-  if(!user) {
-    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
-  }
-  if(user.energy < user.loseEnergyPerTap) {
-    return res.status(StatusCodes.OK).json({success: false, status: 'noenergy', msg: 'There is no energy!'});
-  }
-
-  user.addOnion(user.earnPerTap);
-  user.energy -= user.loseEnergyPerTap;
-  if(user.energy < 0) {
-    user.energy = 0;
-  }
-  user.lastEnergyUpdate = Date.now();
-  await user.save();
-
-  return res.status(StatusCodes.OK).json({success: true, onion: user.onion, energy: user.energy});
-}
-
-const growUp = async (req,res) => {
-  const {userid} = req.body;
-  var user = await User.findOne({userid}).select('-password');
-  if(!user) {
-    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
-  }
-
-  if (user.energy < user.maxEnergy){
-    const addValue = await user.calcEnergyInc();
-    user.energy += addValue; 
-    user.lastEnergyUpdate = Date.now();
-  }
-  await user.save();
-  
-  return res.status(StatusCodes.OK).json({success: true, energy: user.energy});
 }
 
 const purchaseBoost = async (req, res) => {
@@ -452,8 +413,6 @@ module.exports = {
   getAvatarImage,
 
   claimDailyReward,
-  updateUserByTap,
-  growUp,
 
   purchaseBoost,
   getAllBoost,
