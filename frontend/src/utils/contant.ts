@@ -1,5 +1,5 @@
 export const LINK = {
-    TELEGRAM_MINIAPP: 'https://t.me/supercool_catnip_bot',
+    TELEGRAM_MINIAPP: 'https://t.me/supercool_catnip_bot/play',
     TELEGRAM_GROUP: 'https://t.me/tonredonion_onon',
     TELEGRAM_CHANNEL: 'https://t.me/CATNIP_ANNOUNCEMENT',
     X: 'https://x.com/catnipsprint',
