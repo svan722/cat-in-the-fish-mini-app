@@ -2,22 +2,17 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/User');
 const logger = require('../helper/logger');
 const { createJWT } = require('../utils/jwt');
+const userLogin = require('../utils/login');
 
 const login = async (req, res) => {
-  const { userid } = req.body;
+  const { userid, username, firstname, lastname, is_premium, inviter } = req.body;
 
-  if (!userid) {
-    logger.error('authController login not found userid');
+  const loginRes = await userLogin(userid, username, firstname, lastname, is_premium, inviter);
+  if(!loginRes.success) {
     return res.status(StatusCodes.BAD_REQUEST).json('Please provide userid');
   }
 
-  var user = await User.findOne({ userid });
-  if (!user) {
-    return res.status(StatusCodes.BAD_REQUEST).json('there is no user');
-  }
-
-  const token = createJWT({ payload: { userid: user.userid, username: user.username } });
-  res.status(StatusCodes.OK).json({ token });
+  res.status(StatusCodes.OK).json({ token: loginRes.token });
 };
 
 module.exports = {

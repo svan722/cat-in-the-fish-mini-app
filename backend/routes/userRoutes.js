@@ -20,8 +20,6 @@ const {
 
     getAvatarImage,
     claimDailyReward,
-    updateUserByTap,
-    growUp,
 
     purchaseBoost,
     getAllBoost,
@@ -42,8 +40,7 @@ router.post('/tweet', authenticateUser, retweet);
 router.post('/subscribe_youtube', authenticateUser, subscribe_youtube);
 router.post('/visit_website', authenticateUser, visit_website);
 router.post('/follow', authenticateUser, follow_task_do);
-router.put('/tap', authenticateUser, updateUserByTap);
-router.put('/growUp',authenticateUser, growUp);
+
 router.get('/avatar/:userid', getAvatarImage);
 router.post('/claim/daily', authenticateUser, claimDailyReward);
 

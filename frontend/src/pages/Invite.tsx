@@ -9,14 +9,14 @@ const Invite = () => {
     const utils = useUtils();
 
     const handleClickInviteLink = () => {
-        const link = LINK.TELEGRAM_MINIAPP + '?start=' + initData?.user?.id;
+        const link = LINK.TELEGRAM_MINIAPP + '?startapp=' + initData?.user?.id;
         const shareText = 'Join our telegram mini app.';
         const fullUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(shareText)}`;
         utils.openTelegramLink(fullUrl);
     }
 
     const handleInviteLinkCopyButton = () => {
-        const link = LINK.TELEGRAM_MINIAPP + '?start=' + initData?.user?.id;
+        const link = LINK.TELEGRAM_MINIAPP + '?startapp=' + initData?.user?.id;
         navigator.clipboard.writeText(link)
             .then(() => toast.success('Copied.'))
             .catch();

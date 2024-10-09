@@ -5,60 +5,8 @@ const download = require('download');
 
 // database
 const connectDB = require('./db/connect');
-const User = require('./models/User');
 const logger = require('./helper/logger');
-
-const { BONUS } = require('./helper/constants');
-const { createJWT } = require('./utils/jwt');
-
-const login = async (userid, username, firstname, lastname, is_premium, inviter) => {
-    logger.info(`authlogin userid=${userid}, username=${username}, firstname=${firstname}, lastname=${lastname}, inviter=${inviter}, premium=${is_premium}`);
-  
-    if (!userid) {
-      logger.error('authlogin not found userid');
-      return {success: false, msg: 'failed'};
-    }
-  
-    var user = await User.findOne({ userid });
-    if (!user) {
-      user = await User.create({
-        userid,
-        username,
-        firstname, lastname,
-        isPremim: is_premium,
-        inviter,
-      });
-      if(inviter && inviter != '') {
-        var inviteUser = await User.findOne({userid: inviter});
-        if(inviteUser && !inviteUser.friends.includes(user._id)) {
-          logger.info('inviter bonus start')
-          inviteUser.friends.push(user._id);
-
-          const calcInviteBonus = (count, is_premium) => {
-            var value = is_premium ? BONUS.INVITE_FRIEND_WITH_PREMIUM : BONUS.INVITE_FRIEND;
-            if(count < 10) {
-                value *= 1;
-            } else if(count < 100) {
-                value *= 1.3;
-            } else if(count < 500) {
-                value *= 1.5;
-            } else if(count < 1000) {
-                value *= 1.8;
-            } else {
-                value *= 2;
-            }
-            return Math.floor(value);
-          };
-          
-          const inviteBonus = calcInviteBonus(inviteUser.friends.length, is_premium);
-          inviteUser.addOnion(inviteBonus);
-          await inviteUser.save();
-        }
-      }
-    }
-    const token = createJWT({ payload: { userid, username } });
-    return {success: true, token, msg: 'login success'};
-};
+const userLogin = require('./utils/login');
 
 const botStart = async () => {
     await connectDB(process.env.MONGO_URL);
@@ -94,7 +42,7 @@ const botStart = async () => {
         const isPremium = ctx.from.is_premium || false;
         const inviter = ctx.match;
 
-        const loginRes = await login(userid, username, firstname, lastname, isPremium, inviter);
+        const loginRes = await userLogin(userid, username, firstname, lastname, isPremium, inviter);
         if(!loginRes.success) {
             await ctx.reply("Sorry, seems like you don't have any telegram id, set your telegram id and try again.");
             return;
@@ -108,15 +56,15 @@ const botStart = async () => {
         const keyboard = new InlineKeyboard()
             .webApp('😺 Play Now 😺', play_url)
             .row()
-            .url('🚀 ✖ 🚀', 'https://x.com/catnipsprint?t=w9mTEnT0h7M7zzj9ki4jpw&s=09')
-            .url('👬 Join 👬', 'https://t.me/CATNIP_ANNOUNCEMENT')
+            .url('🚀 ✖ 🚀', 'https://x.com/test')
+            .url('👬 Join 👬', 'https://t.me/test')
             .row()
             .url('🙈 Invite 🙉', invite_fullUrl)
 
         await ctx.replyWithPhoto(
             process.env.BOT_LOGO,
             {
-                caption: '🐾 Tap Catnip and Collect Points!\r\n\r\nExchange your points for tokens and earn USDT. The more Catnip you tap, the bigger your rewards!\r\n\r\n🎁 Invite friends and earn even more points! The more friends you bring, the greater the rewards.\r\n\r\n🚀 Start now! 👇👇👇',
+                caption: 'welcome to cat fish',
                 reply_markup: keyboard,
             }
         );
