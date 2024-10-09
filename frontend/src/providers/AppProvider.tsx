@@ -23,13 +23,6 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
     const [showSplash, setShowSplash] = useState(true);
     const [isAuthenticatied, setAuthenticated] = useState(false);
 
-    const audio = new Howl({
-        src: ['/mp3/background.mp3'],
-        autoplay: true,
-        loop: true,
-        mute: volume === "off"
-    });
-
     const handleClickSplash = () => {
         setShowSplash(false);
     }
@@ -58,6 +51,15 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
             console.log('User logined:', initData?.user?.username, initData?.user?.firstName, initData?.user?.lastName);
         })
         .catch(console.error);
+
+        const audio = new Howl({
+            src: ['/mp3/background.mp3'],
+            autoplay: true,
+            loop: true,
+            mute: volume === "off"
+        });
+
+        audio.play();
     }, []);
 
     return (

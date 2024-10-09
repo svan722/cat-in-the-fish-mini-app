@@ -2,6 +2,7 @@ import { useInitData, useUtils } from "@telegram-apps/sdk-react";
 import { toast } from "react-toastify";
 
 import { LINK } from "@/libs/contant";
+import { Link } from "@/components/Link";
 import Button from "@/components/Button";
 
 const Invite = () => {
@@ -24,7 +25,7 @@ const Invite = () => {
 
     return (
         <div className="flex flex-col h-[100vh]">
-            <img className="absolute top-[27px] right-[27px] w-[30px] h-[30px] cursor-pointer hover:scale-125 hover:active:scale-100 transition-all duration-200" src="/imgs/info.png" alt="" />
+            <Link to="/farm"><img className="absolute top-[27px] right-[27px] w-[30px] h-[30px] cursor-pointer hover:scale-125 hover:active:scale-100 transition-all duration-200" src="/imgs/info.png" alt="" /></Link>
             <div className="flex flex-col items-center justify-center flex-1">
                 <div className="w-[102px] h-[102px] rounded-full bg-gradient-to-b from-[#BEC1AE94] to-[#F0DD9994] flex items-center justify-center">
                     <img className="w-[71px] h-[71px]" src="/imgs/users.png" alt="" />
