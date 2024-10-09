@@ -1,12 +1,12 @@
 export const LINK = {
-    TELEGRAM_MINIAPP: 'https://t.me/tapps_bot',
+    TELEGRAM_MINIAPP: 'https://t.me/CatInTheFishBot',
     TELEGRAM_GROUP: 'https://t.me/tapps_bot',
     TELEGRAM_CHANNEL: 'https://t.me/tapps_bot',
-    X: 'https://x.com/catnipsprint',
-    YOUTUBE: 'https://youtube.com/@Cointswap',
-    WEBSITE: 'https://coint.xyz/',
-    TWEET: 'https://x.com/catnipsprint?t=w9mTEnT0h7M7zzj9ki4jpw&s=09',
-    MANIFEST: 'https://supercoolx.github.io/manifests/catnip-manifest.json',
+    X: 'https://x.com/tapp',
+    YOUTUBE: 'https://youtube.com/@test',
+    WEBSITE: 'https://test.xyz/',
+    TWEET: 'https://x.com/tapp?t=w9mTEnT0h7M7zzj9ki4jpw&s=09',
+    MANIFEST: 'https://supercoolx.github.io/manifests/catfish-manifest.json',
 }
 
 export const ROLE = {

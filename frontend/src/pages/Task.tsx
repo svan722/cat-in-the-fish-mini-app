@@ -16,6 +16,7 @@ const Task = () => {
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
     const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
+    const [isInviteFive, setInviteFive] = useState(false);
     const [dailyReward, setDailyReward] = useState(100);
 
     useEffect(() => {
@@ -108,6 +109,16 @@ const Task = () => {
     const handleYoutubeLink = () => {
         API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.YOUTUBE }).catch(console.error);
         utils.openLink(LINK.YOUTUBE);
+    }
+
+    const handleInviteFiveFriends = () => {
+        API.get(`/users/invite/5/${initData?.user?.id}`).then(res => {
+            if(res.data.success) {
+                setInviteFive(true);
+            } else {
+                //show msg
+            }
+        }).catch(console.error);
     }
 
     return (
@@ -266,7 +277,7 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
+                        <button onClick={handleInviteFiveFriends} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                     </div>
                 </div>
             </div>
