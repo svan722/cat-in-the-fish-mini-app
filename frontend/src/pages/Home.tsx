@@ -45,7 +45,7 @@ const Home = () => {
                     <img className="w-[24px] h-[24px]" src="/imgs/x.svg" alt="" />
                     <div className="text-[16px]">To Earn Coin,Join In<br />Twitter</div>
                 </div>
-                <Link to="/farm" className="w-[45px] h-[45px] flex items-center justify-center border border-[#C6F0FF85] rounded-full bg-gradient-to-b from-[#38AFE3B0] to-[#1E94D3B0] text-[40px] leading-none rotate-180 font-extrabold hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200">!</Link>
+                <Link to="/info" className="w-[45px] h-[45px] flex items-center justify-center border border-[#C6F0FF85] rounded-full bg-gradient-to-b from-[#38AFE3B0] to-[#1E94D3B0] text-[40px] leading-none rotate-180 font-extrabold hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200">!</Link>
             </div>
             <div className="flex flex-col justify-around items-center flex-1 mt-[20px] w-full">
                 <div className="text-center">
@@ -67,7 +67,7 @@ const Home = () => {
                     }
                 >
                     <Placeholder
-                        header="Get Ticket with fish"
+                        header={<span className="text-primary">Get Ticket with fish</span>}
                         action={
                             <Fragment>
                                 <Button onClick={() => handleSwapClick(10)} size="m" stretched>Get 1 Ticket with 10 Fish</Button>
