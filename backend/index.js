@@ -10,12 +10,14 @@ const connectDB = require('./db/connect');
 //  routers
 const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
+const playRouter = require('./routes/playRoutes');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/play', playRouter);
 
 app.use(express.static('../frontend/dist'));
 app.get('*', function(req, res) {

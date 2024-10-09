@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import API from "@/libs/API";
 import { Link } from "@/components/Link";
 import { useApp } from "@/providers/AppProvider";
+import { useInitData } from "@telegram-apps/sdk-react";
 
 const Home = () => {
     const app = useApp();
+    const initData  = useInitData();
+    const [fish, setFish] = useState(0);
+    const [ticket, setTicket] = useState(0);
+
+    useEffect(() => {
+        API.get(`/users/get/${initData?.user?.id}`).then(res => {
+            setFish(res.data.fish);
+            setTicket(res.data.ticket);
+        }).catch(console.error);
+    }, []);
 
     return (
         <div className="flex flex-col items-center w-screen h-screen pt-[23px] pb-[29px] px-[17px]">
@@ -24,7 +36,7 @@ const Home = () => {
             <div className="flex flex-col justify-around items-center flex-1 mt-[20px] w-full">
                 <div className="text-center">
                     <p className="text-[10px]">Your Balance</p>
-                    <p className="text-[21px] leading-none font-extrabold">50</p>
+                    <p className="text-[21px] leading-none font-extrabold">{ fish }</p>
                 </div>
                 <div className="w-[169px] h-[169px] rounded-full bg-gradient-to-b from-[#BEC1AEA6] to-[#F0DD99A6] flex items-center justify-center">
                     <img className="w-[118px] h-[118px]" src="/imgs/tg-fish.svg" alt="" />
@@ -33,7 +45,7 @@ const Home = () => {
                     <div className="w-[23px] h-[23px] rounded-full bg-white flex items-center justify-center">
                         <img className="w-[13px] h-[6px]" src="/imgs/point.svg" alt="" />
                     </div>
-                    <span className="font-bold text-[20px]">1</span>
+                    <span className="font-bold text-[20px]">{ ticket }</span>
                 </button>
                 <Link to="/play" className="rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] w-full h-[64px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100">PLAY GAMES</Link>
             </div>

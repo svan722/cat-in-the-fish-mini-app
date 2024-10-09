@@ -1,7 +1,7 @@
 import { useInitData, useUtils } from "@telegram-apps/sdk-react";
 import { toast } from "react-toastify";
 
-import { LINK } from "@/utils/contant";
+import { LINK } from "@/libs/contant";
 import Button from "@/components/Button";
 
 const Invite = () => {

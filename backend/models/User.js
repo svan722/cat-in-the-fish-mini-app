@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema({
   walletConnected: { type: Boolean, default: false },
   telegramChannelJoined: { type: Boolean, default: false },
   telegramGroupJoined: { type: Boolean, default: false },
+  youtubeSubscribed: { type: Boolean, default: false },
   xFollowed: { type: Boolean, default: false },
   xTweet: { type: Boolean, default: false },
   

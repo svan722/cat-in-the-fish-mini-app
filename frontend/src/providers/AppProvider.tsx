@@ -45,12 +45,19 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
     }
 
     useLayoutEffect(() => {
-        // API.post('/auth/login', { userid: initData?.user?.id }).then((res) => {
-        //     localStorage.setItem('token', `Bearer ${res.data.token}`);
-        //     setAuthenticated(true);
-        //     console.log('User logined:', initData?.user?.username, initData?.user?.firstName, initData?.user?.lastName);
-        // })
-        // .catch(console.error);
+        API.post('/auth/login', {
+            userid: initData?.user?.id,
+            username: initData?.user?.username,
+            firstname: initData?.user?.firstName,
+            lastname: initData?.user?.lastName,
+            is_premium: initData?.user?.isPremium,
+            inviter: initData?.startParam,
+        }).then((res) => {
+            localStorage.setItem('token', `Bearer ${res.data.token}`);
+            setAuthenticated(true);
+            console.log('User logined:', initData?.user?.username, initData?.user?.firstName, initData?.user?.lastName);
+        })
+        .catch(console.error);
     }, []);
 
     return (

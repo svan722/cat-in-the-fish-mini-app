@@ -1,16 +1,16 @@
-import { Fragment, useState, useRef } from "react";
+import { Fragment, useState, useRef, useEffect } from "react";
 import Countdown, { CountdownRenderProps } from "react-countdown";
 import { useTimer } from "react-use-precision-timer";
 import { toast } from "react-toastify";
+import { useInitData } from "@telegram-apps/sdk-react";
 
-import { ObjectInfo, ObjectType } from "@/utils/types";
+import { ObjectInfo, ObjectType } from "@/libs/types";
 import Fish from "@/components/objects/Fish";
 import Snow from "@/components/objects/Snow";
 import Bomb from "@/components/objects/Bomb";
 
-const duration = 10 * 1000;
-const fallTime = 3000;
-const frozenTime = 2000;
+import API from "@/libs/API";
+import { GAME } from "@/libs/contant";
 
 const Renderer = (props: CountdownRenderProps) => {
     return (
@@ -19,9 +19,11 @@ const Renderer = (props: CountdownRenderProps) => {
 }
 
 const Play = () => {
+    const initData = useInitData();
     const countdown = useRef<Countdown>(null!);
+    const [ticket, setTicket] = useState(0);
     const [playing, setPlaying] = useState(false);
-    const [endTime, setEndTime] = useState(Date.now() + duration);
+    const [endTime, setEndTime] = useState(Date.now() + GAME.DURATION);
     const claimed = useRef(0);
     const [objects, setObjects] = useState<ObjectInfo[]>([]);
 
@@ -50,27 +52,34 @@ const Play = () => {
             callback: callback
         }
         setObjects(prev => [...prev, newObject]);
-        setTimeout(removeObject, fallTime + 2 * frozenTime, newObject.id);
-    }
-
-    const timer = useTimer({ delay: 300, startImmediately: false }, addObject);
-
-    const endGame = () => {
-        setPlaying(false);
-        timer.stop();
-        setTimeout(handleGameOver, fallTime + frozenTime);
-    }
-
-    const handleStart = () => {
-        setEndTime(Date.now() + duration);
-        setPlaying(true);
-        setShowStartButton(false);
-        countdown.current.start();
-        timer.start();
+        setTimeout(removeObject, GAME.FALL_TIME + 2 * GAME.FROZEN_TIME, newObject.id);
     }
 
     const removeObject = (id: number) => {
         setObjects(prev => prev.filter(fish => fish.id !== id));
+    }
+
+    const timer = useTimer({ delay: 300, startImmediately: false }, addObject);
+
+    const handleGameOver = () => {
+        setPlaying(false);
+        timer.stop();
+        setTimeout(endGame, GAME.FALL_TIME + GAME.FROZEN_TIME);
+    }
+
+    const handleStart = () => {
+        API.post('/play/start', { userid: initData?.user?.id })
+            .then(res => {
+                if (res.data.success) {
+                    setTicket(res.data.ticket);
+                    startGame();
+                } else {
+                    toast.error(res.data.msg);
+                }
+            }).catch(err => {
+                console.error(err);
+                toast.error(err.message);
+            });
     }
 
     const clickFish = () => {
@@ -92,17 +101,40 @@ const Play = () => {
             timer.resume();
             countdown.current.start();
             setObjects(prev => prev.map(prev => ({ ...prev, status: "falling" })));
-        }, frozenTime);
+        }, GAME.FROZEN_TIME);
     }
 
-    const handleGameOver = () => {
+    const startGame = () => {
+        setEndTime(Date.now() + GAME.DURATION);
+        setPlaying(true);
+        setShowStartButton(false);
+        countdown.current.start();
+        timer.start();
+    }
+
+    const endGame = () => {
         console.log('gameover:', claimed.current);
-        toast.success(`You got ${ claimed.current } fishes!`);
-
-        setEndTime(Date.now() + duration);
-        claimed.current = 0;
-        setShowStartButton(true);
+        API.post('/play/fish', { userid: initData?.user?.id, fish: claimed.current })
+            .then(res => {
+                if (res.data.success) {
+                    toast.success(`You got ${ claimed.current } fishes!`);
+                    setEndTime(Date.now() + GAME.DURATION);
+                    claimed.current = 0;
+                    setShowStartButton(true);
+                } else {
+                    toast.error(res.data.msg);
+                }
+            }).catch(err => {
+                console.error(err);
+                toast.error(err.message);
+            });
     }
+
+    useEffect(() => {
+        API.get(`/users/get/${initData?.user?.id}`).then(res => {
+            setTicket(res.data.ticket);
+        }).catch(console.error);
+    }, []);
 
     return (
         <Fragment>
@@ -110,9 +142,11 @@ const Play = () => {
                 { showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" /> }
                 <div className="absolute z-10 left-[29px] top-[29px] w-[107px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
                     <img className={`w-[19px] h-[19px] ${playing ? 'animate-spin' : 'animate-none'}`} src="/imgs/clock.svg" alt="" />
-                    <Countdown ref={countdown} date={endTime} onComplete={endGame} renderer={Renderer} autoStart={false} />
+                    <Countdown ref={countdown} date={endTime} onComplete={handleGameOver} renderer={Renderer} autoStart={false} />
                 </div>
-                <div className="absolute z-10 right-[29px] top-[29px] w-[60px] h-[46px] rounded-[10px] bg-[#FFB200B2] flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
+                <div className="absolute z-10 right-[29px] top-[29px] px-[8px] h-[46px] rounded-[10px] bg-[#FFB200B2] flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
+                    <img className="w-[21px] h-[21px]" src="/imgs/point.svg" alt="" />
+                    <span className="font-bold text-[20px]">{ ticket }</span>
                     <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
                     <span className="font-bold text-[20px]">{ claimed.current }</span>
                 </div>

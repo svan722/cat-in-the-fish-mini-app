@@ -56,11 +56,11 @@ const joinTelegram = async (req, res) => {
   if(user) {
     const isDBTGJoined = type == 'channel' ? user.telegramChannelJoined : user.telegramGroupJoined;
     if(isDBTGJoined) {
-      return res.status(StatusCodes.OK).json({success: false, status: 'exist', msg: 'already received!'});
+      return res.status(StatusCodes.OK).json({success: false, status: 'exist', msg: 'Already received!'});
     }
     const isTGJoined = await isUserTGJoined(userid, type == 'channel' ? TELEGRAM.CHANNEL_ID : TELEGRAM.GROUP_ID);
     if(!isTGJoined) {
-      return res.status(StatusCodes.OK).json({success: false, status: 'notyet', msg: `not joined telegram ${type} yet!`});
+      return res.status(StatusCodes.OK).json({success: false, status: 'notyet', msg: `Not joined telegram ${type} yet!`});
     }
     var bonus = 0;
     if(type == 'channel') {
@@ -73,9 +73,9 @@ const joinTelegram = async (req, res) => {
     user.addFish(bonus);
 
     await user.save();
-    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received telegram joined bonus', fish: user.fish, bonus: bonus});
+    return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received telegram joined bonus', fish: user.fish, bonus: bonus});
   }
-  return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'there is no userid!'});
+  return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no userid!'});
 };
 const followX = async (req, res) => {
   const { userid, username } = req.body;

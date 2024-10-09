@@ -1,4 +1,4 @@
-import { ObjectProps } from "@/utils/types";
+import { ObjectProps } from "@/libs/types";
 import { useState } from "react";
 
 const Bomb = ({ left, callback, status }: ObjectProps) => {

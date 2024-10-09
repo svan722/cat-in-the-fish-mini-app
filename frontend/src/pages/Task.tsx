@@ -1,5 +1,113 @@
+import { useState, useEffect, Fragment } from 'react';
+import { useInitData, useUtils } from "@telegram-apps/sdk-react";
+import { toast } from 'react-toastify';
+import Countdown from 'react-countdown';
+
+import { Modal, Placeholder, Button } from '@telegram-apps/telegram-ui';
+import API from '@/libs/API';
+import { LINK, PLATFORM } from '@/libs/contant';
+
 const Task = () => {
-    
+    const initData = useInitData();
+    const utils = useUtils();
+
+    const [dailyRemainSecond, setDailyRemainSecond] = useState(0);
+    const [isJoinedTelegramGroup, setJoinedTelegramGroup] = useState(false);
+    const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
+    const [isFollowingYouTube, setFollowingYouTube] = useState(false);
+    const [isFollowingX, setFollowingX] = useState(false);
+
+    useEffect(() => {
+        API.get(`/users/get/${initData?.user?.id}`).then(res => {
+            setFollowingX(res.data.xFollowed);
+            setFollowingYouTube(res.data.youtubeSubscribed);
+            setJoinedTelegramChannel(res.data.telegramChannelJoined);
+            setJoinedTelegramGroup(res.data.telegramGroupJoined);
+        }).catch(console.error);
+        handleClaimDailyReward();
+    }, [initData]);
+
+    const handleClaimDailyReward = (status = 0) => {
+        API.post(`/users/claim/daily`, { userid: initData?.user?.id, status }).then(res => {
+            if (res.data.success) {
+                setDailyRemainSecond(res.data.ms);
+                if (res.data.status == 'success') {
+                    toast.success('Claimed successfully.');
+                }
+            } else {
+                toast.error(res.data.msg);
+            }
+        }).catch(console.error);
+    }
+
+    const handleJoinTelegramGroup = () => {
+        API.post('/users/jointg', {
+            userid: initData?.user?.id,
+            type: 'group'
+        }).then(res => {
+            if(res.data.success) {
+                setJoinedTelegramGroup(true);
+                // setOpenGroupModal(false);
+                toast.success(res.data.msg);
+            }
+            else toast.error(res.data.msg);
+        }).catch(console.error);
+    }
+
+    const handleJoinTelegramChannel = () => {
+        API.post('/users/jointg', {
+            userid: initData?.user?.id,
+            type: 'channel'
+        }).then(res => {
+            if(res.data.success) {
+                setJoinedTelegramChannel(true);
+                // setOpenChannelModal(false);
+                toast.success(res.data.msg);
+            }
+            else toast.error(res.data.msg);
+        }).catch(console.error);
+    }
+
+    const handleFollowX = () => {
+        API.post('/users/followx', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
+            if(res.data.success) {
+                setFollowingX(true);
+                // setOpenFollowXModal(false);
+                toast.success(res.data.msg);
+            }
+            else toast.error(res.data.msg);
+        }).catch(console.error);
+    }
+
+    const handleFollowYoutube = () => {
+        API.post('/users/subscribe_youtube', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
+            if(res.data.success) {
+                setFollowingYouTube(true);
+                // setOpenRetweetXModal(false);
+                toast.success(res.data.msg);
+            }
+            else toast.error(res.data.msg);
+        }).catch(err => console.error(err));
+    }
+
+    const handleTGGroupLink = () => {
+        utils.openTelegramLink(LINK.TELEGRAM_GROUP);
+    }
+
+    const handleTGChannelLink = () => {
+        utils.openTelegramLink(LINK.TELEGRAM_CHANNEL);
+    }
+
+    const handleXLink = () => {
+        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.X }).catch(console.error);
+        utils.openLink(LINK.X);
+    }
+
+    const handleYoutubeLink = () => {
+        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.YOUTUBE }).catch(console.error);
+        utils.openLink(LINK.YOUTUBE);
+    }
+
     return (
         <div className="pt-[16px] px-[14px] pb-[20px]">
             <div className="daily-task">
@@ -18,12 +126,18 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Check now</button>
+                        {
+                            dailyRemainSecond > 0 ?
+                                <button className="w-[95px] h-[36px] rounded-[5px] text-[14px] cursor-not-allowed bg-white text-primary">
+                                    <Countdown date={Date.now() + dailyRemainSecond} intervalDelay={1000} precision={3} onComplete={() => setDailyRemainSecond(0)} renderer={(props) => <span className="text-primary">{props.hours.toString().padStart(2, '0')} : {props.minutes.toString().padStart(2, '0')} : {props.seconds.toString().padStart(2, '0')}</span>} />
+                                </button> :
+                                <button onClick={() => handleClaimDailyReward(1)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Check now</button>
+                        }
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
                             <div className="w-[48px] h-[48px] rounded-[8px] bg-[#2DA9E6] flex justify-center items-center">
-                            <img src="/imgs/tg-icon.svg" alt="" className="w-[26px] h-[21px]" />
+                                <img src="/imgs/tg-icon.svg" alt="" className="w-[26px] h-[21px]" />
                             </div>
                             <div className="flex flex-col justify-center gap-[6px]">
                                 <div className="text-[15px] leading-none">Follow TG Chat</div>
@@ -33,7 +147,20 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Check now</button>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button disabled={isJoinedTelegramGroup} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Follow TG Chat"
+                                action={
+                                    <Fragment>
+                                        <Button onClick={handleTGGroupLink} size="m" stretched>Follow</Button>
+                                        <Button onClick={handleJoinTelegramGroup} size="m" stretched>Check now</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
                     </div>
                 </div>
             </div>
@@ -53,7 +180,20 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Complete</button>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button disabled={isJoinedTelegramChannel} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Join our TG channel"
+                                action={
+                                    <Fragment>
+                                        <Button onClick={handleTGChannelLink} size="m" stretched>Join</Button>
+                                        <Button onClick={handleJoinTelegramChannel} size="m" stretched>Complete</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -68,7 +208,20 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Complete</button>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button disabled={isFollowingX} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Join Twitter channel"
+                                action={
+                                    <Fragment>
+                                        <Button onClick={handleXLink} size="m" stretched>Join</Button>
+                                        <Button onClick={handleFollowX} size="m" stretched>Complete</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -83,7 +236,20 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Complete</button>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button disabled={isFollowingYouTube} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Join Youtube channel"
+                                action={
+                                    <Fragment>
+                                        <Button onClick={handleYoutubeLink} size="m" stretched>Join</Button>
+                                        <Button onClick={handleFollowYoutube} size="m" stretched>Complete</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -98,7 +264,20 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Complete</button>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Join telegram channel"
+                                action={
+                                    <Fragment>
+                                        <Button size="m" stretched>Join</Button>
+                                        <Button size="m" stretched>Join</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
                     </div>
                 </div>
             </div>

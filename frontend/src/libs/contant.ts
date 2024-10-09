@@ -1,7 +1,7 @@
 export const LINK = {
-    TELEGRAM_MINIAPP: 'https://t.me/supercool_catnip_bot/play',
-    TELEGRAM_GROUP: 'https://t.me/tonredonion_onon',
-    TELEGRAM_CHANNEL: 'https://t.me/CATNIP_ANNOUNCEMENT',
+    TELEGRAM_MINIAPP: 'https://t.me/tapps_bot',
+    TELEGRAM_GROUP: 'https://t.me/tapps_bot',
+    TELEGRAM_CHANNEL: 'https://t.me/tapps_bot',
     X: 'https://x.com/catnipsprint',
     YOUTUBE: 'https://youtube.com/@Cointswap',
     WEBSITE: 'https://coint.xyz/',
@@ -12,6 +12,12 @@ export const LINK = {
 export const ROLE = {
     ADMIN: 'admin',
     USER: 'user'
+}
+
+export const GAME = {
+    FALL_TIME: 3000,
+    FROZEN_TIME: 2000,
+    DURATION: 10 * 1000
 }
 
 export const OWNER_ADDRESS = "UQADlThF2_zCkpo_MYhO7IXUeO31ooNLB_A_SMcZHdAKf5qk";
