@@ -211,6 +211,28 @@ const follow_task_do = async (req, res) => {
   return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Follow success!'});
 };
 
+const inviteTask = async (req, res) => {
+  const { userid, count } = req.body;
+
+  const user = await User.findOne({ userid });
+  if (!user) {
+    return res.status(StatusCodes.OK).json({ success: false, status: 'nouser', msg: 'Can not find user!' });
+  }
+  if(user.inviteFive) {
+    return res.status(StatusCodes.OK).json({ success: false, status: 'already', msg: 'You have to claim already!' });
+  }
+  if(count != 5) {
+    return res.status(StatusCodes.OK).json({ success: false, status: 'invalid', msg: 'Invalid number!' });
+  }
+  if(user.friends.length < 5) {
+    return res.status(StatusCodes.OK).json({ success: false, status: 'notyet', msg: 'Not yet completed!' });
+  }
+  user.inviateFive = true;
+  user.addFish(BONUS.INVITE_FIVE_FRIENT);
+  await user.save();
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Invite five friends task Completed!'});
+};
+
 const getAvatarImage = (req, res) => {
   const { userid } = req.params;
   const url = path.join(__dirname, '..', 'uploads/avatars', userid + '.jpg');
@@ -409,6 +431,7 @@ module.exports = {
   subscribe_youtube,
   visit_website,
   follow_task_do,
+  inviteTask,
 
   getAvatarImage,
 

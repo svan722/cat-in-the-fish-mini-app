@@ -17,6 +17,7 @@ const UserSchema = new mongoose.Schema({
   youtubeSubscribed: { type: Boolean, default: false },
   xFollowed: { type: Boolean, default: false },
   xTweet: { type: Boolean, default: false },
+  inviteFive: { type: Boolean, default: false },
   
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   role: { type: String, enum: ['admin', 'user'], default: 'user' },
