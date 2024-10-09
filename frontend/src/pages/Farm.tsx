@@ -16,7 +16,7 @@ const Farm = () => {
                     </button>
                     <img className="w-[17px] h-[17px]" src="/imgs/equal.svg" alt="" />
                     <button className="flex items-center justify-center gap-[6px] w-[84px] h-[30px] rounded-[10px] border border-dotted border-[#73E3FC] bg-[#07A5FF]">
-                        <img className="w-[21px] h-[21px]" src="/imgs/pause.png" alt="" />
+                        <img className="w-[19px] h-[17px]" src="/imgs/pause.png" alt="" />
                         <span className="text-[10px] leading-none">% PUSS</span>
                     </button>
                 </div>
