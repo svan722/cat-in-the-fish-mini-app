@@ -17,7 +17,7 @@ export const ROLE = {
 export const GAME = {
     FALL_TIME: 3000,
     FROZEN_TIME: 2000,
-    DURATION: 10 * 1000
+    DURATION: 3 * 60 * 1000 //3 min
 }
 
 export const OWNER_ADDRESS = "UQADlThF2_zCkpo_MYhO7IXUeO31ooNLB_A_SMcZHdAKf5qk";
