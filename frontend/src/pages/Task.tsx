@@ -16,7 +16,7 @@ const Task = () => {
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
     const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
-    const [isInviteFive, setInviteFive] = useState(false);
+    // const [isInviteFive, setInviteFive] = useState(false);
     const [dailyReward, setDailyReward] = useState(100);
 
     useEffect(() => {
@@ -114,7 +114,7 @@ const Task = () => {
     const handleInviteFiveFriends = () => {
         API.get(`/users/invite/5/${initData?.user?.id}`).then(res => {
             if(res.data.success) {
-                setInviteFive(true);
+                // setInviteFive(true);
             } else {
                 //show msg
             }
