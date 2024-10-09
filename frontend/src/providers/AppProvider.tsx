@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import { createContext, useContext } from "react";
 import { useInitData } from "@telegram-apps/sdk-react";
 import { Howl, Howler } from "howler";
@@ -19,7 +19,7 @@ const AppContext = createContext<AppContextData | null>(null);
 const AppProvider = ({ children }: { children: JSX.Element }) => {
 
     const initData = useInitData();
-    const [volume, setVolume] = useState<Volume>(localStorage.getItem('volume') === "on" ? "on" : "off");
+    const [volume, setVolume] = useState<Volume>(localStorage.getItem('volume') === "off" ? "off" : "on");
     const [showSplash, setShowSplash] = useState(true);
     const [isAuthenticatied, setAuthenticated] = useState(false);
 
@@ -27,14 +27,14 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
         setShowSplash(false);
     }
 
+    useEffect(() => {
+        let isMute = volume === "off";
+        Howler.mute(isMute);
+        localStorage.setItem('volume', volume); 
+    }, [volume])
+
     const toggleMusic = () => {
-        setVolume(prev => {
-            let isOn = prev === "on";
-            Howler.mute(isOn);
-            let newVolume: Volume = isOn ? "off" : "on";
-            localStorage.setItem('volume', newVolume)
-            return newVolume;
-        });
+        setVolume(prev => prev === "on" ? "off" : "on");
     }
 
     useLayoutEffect(() => {
@@ -55,8 +55,7 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
         const audio = new Howl({
             src: ['/mp3/background.mp3'],
             autoplay: true,
-            loop: true,
-            mute: volume === "off"
+            loop: true
         });
 
         audio.play();
