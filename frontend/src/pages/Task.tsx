@@ -16,7 +16,7 @@ const Task = () => {
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
     const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
-    // const [isInviteFive, setInviteFive] = useState(false);
+    const [isInviteFive, setInviteFive] = useState(false);
     const [dailyReward, setDailyReward] = useState(100);
 
     useEffect(() => {
@@ -25,6 +25,7 @@ const Task = () => {
             setFollowingYouTube(res.data.youtubeSubscribed);
             setJoinedTelegramChannel(res.data.telegramChannelJoined);
             setJoinedTelegramGroup(res.data.telegramGroupJoined);
+            setInviteFive(res.data.inviteFive);
         }).catch(console.error);
         handleClaimDailyReward();
     }, [initData]);
@@ -90,7 +91,7 @@ const Task = () => {
                 toast.success(res.data.msg);
             }
             else toast.error(res.data.msg);
-        }).catch(err => console.error(err));
+        }).catch(console.error);
     }
 
     const handleTGGroupLink = () => {
@@ -112,11 +113,11 @@ const Task = () => {
     }
 
     const handleInviteFiveFriends = () => {
-        API.get(`/users/invite/5/${initData?.user?.id}`).then(res => {
+        API.post('/users/invite/task', { userid: initData?.user?.id, count: 5 }).then(res => {
             if(res.data.success) {
-                // setInviteFive(true);
+                setInviteFive(true);
             } else {
-                //show msg
+                toast.error(res.data.msg);
             }
         }).catch(console.error);
     }
@@ -273,11 +274,11 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Invite 5 Friends </div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ 5,000</span>
                                 </div>
                             </div>
                         </div>
-                        <button onClick={handleInviteFiveFriends} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
+                        <button disabled={isInviteFive} onClick={handleInviteFiveFriends} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                     </div>
                 </div>
             </div>
