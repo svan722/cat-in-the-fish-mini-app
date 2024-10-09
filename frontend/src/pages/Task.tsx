@@ -16,6 +16,7 @@ const Task = () => {
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
     const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
+    const [dailyReward, setDailyReward] = useState(100);
 
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
@@ -31,6 +32,7 @@ const Task = () => {
         API.post(`/users/claim/daily`, { userid: initData?.user?.id, status }).then(res => {
             if (res.data.success) {
                 setDailyRemainSecond(res.data.ms);
+                setDailyReward(res.data.reward);
                 if (res.data.status == 'success') {
                     toast.success('Claimed successfully.');
                 }
@@ -122,7 +124,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Daily reward</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ {dailyReward}</span>
                                 </div>
                             </div>
                         </div>
@@ -143,7 +145,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Follow TG Chat</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ 250</span>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +178,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Join our TG channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ 300</span>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +206,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Join Twitter channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ 300</span>
                                 </div>
                             </div>
                         </div>
@@ -232,7 +234,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Join Youtube channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 100,000</span>
+                                    <span className="text-[12px] leading-none">+ 20</span>
                                 </div>
                             </div>
                         </div>
@@ -264,20 +266,7 @@ const Task = () => {
                                 </div>
                             </div>
                         </div>
-                        <Modal
-                            header={<Modal.Header />}
-                            trigger={<button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                        >
-                            <Placeholder
-                                header="Join telegram channel"
-                                action={
-                                    <Fragment>
-                                        <Button size="m" stretched>Join</Button>
-                                        <Button size="m" stretched>Join</Button>
-                                    </Fragment>
-                                }
-                            />
-                        </Modal>
+                        <button className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                     </div>
                 </div>
             </div>
