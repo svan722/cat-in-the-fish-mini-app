@@ -19,6 +19,7 @@
   "author": "supercoolx",
   "license": "ISC",
   "devDependencies": {
+    "@types/howler": "^2.2.12",
     "concurrently": "^9.0.1"
   }
 }
