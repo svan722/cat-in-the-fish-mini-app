@@ -14,7 +14,7 @@ const Task = () => {
     const [dailyRemainSecond, setDailyRemainSecond] = useState(0);
     const [isJoinedTelegramGroup, setJoinedTelegramGroup] = useState(false);
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
-    const [isFollowingYouTube, setFollowingYouTube] = useState(false);
+    // const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
     const [isInviteFive, setInviteFive] = useState(false);
     const [dailyReward, setDailyReward] = useState(100);
@@ -22,7 +22,7 @@ const Task = () => {
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
             setFollowingX(res.data.xFollowed);
-            setFollowingYouTube(res.data.youtubeSubscribed);
+            // setFollowingYouTube(res.data.youtubeSubscribed);
             setJoinedTelegramChannel(res.data.telegramChannelJoined);
             setJoinedTelegramGroup(res.data.telegramGroupJoined);
             setInviteFive(res.data.inviteFive);
@@ -83,16 +83,16 @@ const Task = () => {
         }).catch(console.error);
     }
 
-    const handleFollowYoutube = () => {
-        API.post('/users/subscribe_youtube', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
-            if(res.data.success) {
-                setFollowingYouTube(true);
-                // setOpenRetweetXModal(false);
-                toast.success(res.data.msg);
-            }
-            else toast.error(res.data.msg);
-        }).catch(console.error);
-    }
+    // const handleFollowYoutube = () => {
+    //     API.post('/users/subscribe_youtube', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
+    //         if(res.data.success) {
+    //             setFollowingYouTube(true);
+    //             // setOpenRetweetXModal(false);
+    //             toast.success(res.data.msg);
+    //         }
+    //         else toast.error(res.data.msg);
+    //     }).catch(console.error);
+    // }
 
     const handleTGGroupLink = () => {
         utils.openTelegramLink(LINK.TELEGRAM_GROUP);
@@ -107,10 +107,10 @@ const Task = () => {
         utils.openLink(LINK.X);
     }
 
-    const handleYoutubeLink = () => {
-        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.YOUTUBE }).catch(console.error);
-        utils.openLink(LINK.YOUTUBE);
-    }
+    // const handleYoutubeLink = () => {
+    //     API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.YOUTUBE }).catch(console.error);
+    //     utils.openLink(LINK.YOUTUBE);
+    // }
 
     const handleInviteFiveFriends = () => {
         API.post('/users/invite/task', { userid: initData?.user?.id, count: 5 }).then(res => {
@@ -237,7 +237,7 @@ const Task = () => {
                             />
                         </Modal>
                     </div>
-                    <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                    {/*<div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
                             <div className="w-[48px] h-[48px] rounded-[8px] bg-[#FC0301] flex justify-center items-center">
                                 <img src="/imgs/play.svg" alt="" className="w-[16px] h-[16px]" />
@@ -264,7 +264,7 @@ const Task = () => {
                                 }
                             />
                         </Modal>
-                    </div>
+                    </div>*/}
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
                             <div className="w-[48px] h-[48px] rounded-[8px] bg-[#0C0C0D] flex justify-center items-center">
