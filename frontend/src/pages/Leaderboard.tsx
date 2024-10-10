@@ -1,8 +1,38 @@
-import Avatar from "@/components/Avatar";
+import { useEffect, useState } from 'react';
+import { useInitData } from "@telegram-apps/sdk-react";
 
+import API from '@/libs/API';
+import Avatar from "@/components/Avatar";
 import { Link } from "@/components/Link";
 
 const Leaderboard = () => {
+    const [users, setUsers] = useState([]);
+    // const [type, setType] = useState("total");
+    // const [selfRank, setSelfRank] = useState(-1);
+    // const [self, setSelf] = useState(null);
+
+    const [userCount, setUserCount] = useState(0);
+    // const [isCounting, setCounting] = useState(false);
+
+    const initData = useInitData();
+
+    useEffect(() => {
+        API.get('/users/count/all')
+            .then(res => {
+                setUserCount(res.data.count);
+                // setCounting(true);
+            })
+            .catch(console.error);
+    }, []);
+    useEffect(() => {
+        API.get(`/users/ranking/${initData?.user?.id}/total`)
+            .then(res => {
+                setUsers(res.data.users);
+                // setSelfRank(res.data.rank);
+                // setSelf(res.data.self);
+            }).catch(console.error);
+    }, [])
+    
     return (
         <div className="w-screen h-screen px-[16px]">
             <h1 className="text-[40px] font-extrabold text-center text-[#F1F3B1]">Leaderboard</h1>
@@ -19,21 +49,23 @@ const Leaderboard = () => {
                 </div>
                 <div>#784773</div>
             </div>
-            <h2 className="text-[20px] mt-[36px] mb-[20px]">46.9M holders</h2>
+            <h2 className="text-[20px] mt-[36px] mb-[20px]">{userCount} holders</h2>
             <div className="h-[calc(100vh-330px)] overflow-y-auto flex flex-col gap-[28px]">
-                <div className="flex items-center justify-between pr-[20px]">
-                    <div className="flex gap-[10px] items-center">
-                        <Avatar width={32} height={32} />
-                        <div className="flex flex-col justify-center gap-[6px]">
-                            <div className="text-[15px] leading-none">Lofi_k</div>
-                            <div className="flex justify-center items-center gap-[5px]">
-                                <span className="text-[12px] leading-none">1,000</span>
-                                <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                {users.map((_, index) => 
+                    <div key={index} className="flex items-center justify-between pr-[20px]">
+                        <div className="flex gap-[10px] items-center">
+                            <Avatar width={32} height={32} />
+                            <div className="flex flex-col justify-center gap-[6px]">
+                                <div className="text-[15px] leading-none">Lofi_k</div>
+                                <div className="flex justify-center items-center gap-[5px]">
+                                    <span className="text-[12px] leading-none">1,000</span>
+                                    <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                </div>
                             </div>
                         </div>
+                        <div>#784773</div>
                     </div>
-                    <div>#784773</div>
-                </div>
+                )}
             </div>
             <div className="mt-[20px] w-full h-[79px] grid grid-cols-4 items-center justify-center px-[20px] rounded-[16px] bg-[#8AA6B799] backdrop-blur-md">
                 <Link to="/" className="flex flex-col items-center gap-[4px] group hover:stroke-primary stroke-white transition-all duration-200 hover:scale-125 hover:active:scale-100">

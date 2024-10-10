@@ -301,10 +301,10 @@ const getLeaderboard = async (req, res) => {
       users = await User.find({}).sort({ monthlyScore: -1 }).limit(LEADERBOARD_SHOW_USER_COUNT).select('-password');
       rank = await User.countDocuments({ monthlyScore: { $gt: self.monthlyScore } });
     } else if (type == "total"){
-      users = await User.find({}).sort({ totalScore: -1 }).limit(LEADERBOARD_SHOW_USER_COUNT).select('-password');
-      rank = await User.countDocuments({ totalScore: { $gt: self.totalScore } });
+      users = await User.find({}).sort({ fish: -1 }).limit(LEADERBOARD_SHOW_USER_COUNT).select('-password');
+      rank = await User.countDocuments({ fish: { $gt: self.fish } });
     }
-    return res.status(StatusCodes.OK).json({users, rank:rank+1, self});
+    return res.status(StatusCodes.OK).json({users, rank:rank + 1, self});
 
   } catch(error){
     console.log("getLeaderboard error=", error);

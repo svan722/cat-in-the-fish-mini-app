@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@eeacms/countup": "^2.0.6",
     "@telegram-apps/react-router-integration": "^1.0.0",
     "@telegram-apps/sdk-react": "^1.0.0",
     "@telegram-apps/telegram-ui": "^2.1.5",
