@@ -16,10 +16,6 @@ export default {
         secondary: '#F1F3B1'
       },
       keyframes: {
-        'fall': {
-          '0%': { transform: 'translate(-50%, -100%)'},
-          '100%': { transform: 'translate(-50%, 100vh)'}
-        },
         'bomb': {
           '0%': { opacity: '100%' },
           '10%': { opacity: '100%' },
@@ -27,7 +23,6 @@ export default {
         }
       },
       animation: {
-        fall: 'fall 3s linear forwards',
         bomb: 'bomb 3s linear forwards'
       }
     },

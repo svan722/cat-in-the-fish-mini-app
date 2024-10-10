@@ -31,11 +31,11 @@ const swapTicket = async (req, res) => {
     if(!user) {
       return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no user!'});
     }
-    if(fish == 10) {
+    if(fish == 20) {
         user.ticket += 1;
     } else if(fish == 50) {
         user.ticket += 3;
-    } else if(fish == 70) {
+    } else if(fish == 100) {
         user.ticket += 5;
     } else {
         return res.status(StatusCodes.OK).json({success: false, status: 'invalid', msg: 'Invalid fish count!'});

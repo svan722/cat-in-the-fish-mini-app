@@ -1,7 +1,7 @@
-import { useState, useLayoutEffect, useEffect } from "react";
-import { createContext, useContext } from "react";
+import { useState, useLayoutEffect, useEffect, createContext, useContext } from "react";
 import { useInitData } from "@telegram-apps/sdk-react";
 import { Howl, Howler } from "howler";
+import { useNavigate } from "react-router-dom";
 
 import API from "@/libs/API";
 import Splash from "@/pages/Splash";
@@ -19,12 +19,14 @@ const AppContext = createContext<AppContextData | null>(null);
 const AppProvider = ({ children }: { children: JSX.Element }) => {
 
     const initData = useInitData();
+    const navigate = useNavigate();
     const [volume, setVolume] = useState<Volume>(localStorage.getItem('volume') === "off" ? "off" : "on");
     const [showSplash, setShowSplash] = useState(true);
     const [isAuthenticatied, setAuthenticated] = useState(false);
 
     const handleClickSplash = () => {
         setShowSplash(false);
+        navigate('/home');
     }
 
     useEffect(() => {

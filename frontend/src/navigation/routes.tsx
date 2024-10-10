@@ -7,6 +7,7 @@ import Home from '@/pages/Home';
 import Task from '@/pages/Task';
 import Play from '@/pages/Play';
 import Info from '@/pages/Info';
+import Leaderboard from '@/pages/Leaderboard';
 
 interface Route {
   path: string;
@@ -23,4 +24,5 @@ export const routes: Route[] = [
   { path: '/play', Component: Play },
   { path: '/task', Component: Task },
   { path: '/info', Component: Info },
+  { path: '/leaderboard', Component: Leaderboard },
 ];

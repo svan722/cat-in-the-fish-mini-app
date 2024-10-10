@@ -30,3 +30,12 @@ body {
 ::-webkit-scrollbar {
     display: none;
 }
+
+@keyframes fall {
+    from {
+        transform: translate(-50%, -100%);
+    }
+    to {
+        transform: translate(-50%, 100vh);
+    }
+}

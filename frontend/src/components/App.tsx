@@ -59,14 +59,14 @@ export const App: FC = () => {
       appearance={miniApp.isDark ? 'dark' : 'light'}
       platform={['macos', 'ios'].includes(lp.platform) ? 'ios' : 'base'}
     >
-      <AppProvider>
-        <Router location={location} navigator={reactNavigator}>
+      <Router location={location} navigator={reactNavigator}>
+        <AppProvider>
           <Routes>
             {routes.map((route) => <Route key={route.path} {...route} />)}
             <Route path='*' element={<Navigate to='/'/>}/>
           </Routes>
-        </Router>
-      </AppProvider>
+        </AppProvider>
+      </Router>
       <ToastContainer position="top-center" autoClose={3000} theme="dark" />
     </AppRoot>
   );

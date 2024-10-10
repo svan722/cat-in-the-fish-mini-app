@@ -3,8 +3,9 @@ import Countdown, { CountdownRenderProps } from "react-countdown";
 import { useTimer } from "react-use-precision-timer";
 import { toast } from "react-toastify";
 import { useInitData } from "@telegram-apps/sdk-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { ObjectInfo, ObjectType } from "@/libs/types";
+import { Level, ObjectInfo, ObjectType } from "@/libs/types";
 import Fish from "@/components/objects/Fish";
 import Snow from "@/components/objects/Snow";
 import Bomb from "@/components/objects/Bomb";
@@ -19,25 +20,27 @@ const Renderer = (props: CountdownRenderProps) => {
 }
 
 const Play = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const initData = useInitData();
-    const countdown = useRef<Countdown>(null!);
-    const [ticket, setTicket] = useState(0);
-    const [playing, setPlaying] = useState(false);
-    const [endTime, setEndTime] = useState(Date.now() + GAME.DURATION);
-    const claimed = useRef(0);
-    const [objects, setObjects] = useState<ObjectInfo[]>([]);
 
-    const [showStartButton, setShowStartButton] = useState(true);
+    const level: Level = location.state.level;
+    const claimed = useRef(0);
+    const countdown = useRef<Countdown>(null!);
+
+    const [endTime, setEndTime] = useState(Date.now() + GAME[level].DURATION);
+    const [objects, setObjects] = useState<ObjectInfo[]>([]);
     const [showBombEffect, setShowBombEffect] = useState(false);
+    
 
     const addObject = () => {
         const random = Math.random();
         let type: ObjectType;
         let callback;
-        if (random < 0.85) {
+        if (random < 0.87) {
             type = "fish";
             callback = clickFish;
-        } else if (random < 0.95) {
+        } else if (random < 0.97) {
             type = "bomb";
             callback = clickBomb;
         } else {
@@ -49,37 +52,22 @@ const Play = () => {
             type: type,
             left: Math.random() * 100,
             status: "falling",
+            fallTime: GAME[level].FALL_TIME,
             callback: callback
         }
         setObjects(prev => [...prev, newObject]);
-        setTimeout(removeObject, GAME.FALL_TIME + 2 * GAME.FROZEN_TIME, newObject.id);
+        setTimeout(removeObject, GAME[level].FALL_TIME + 2 * GAME[level].FROZEN_TIME, newObject.id);
     }
 
     const removeObject = (id: number) => {
         setObjects(prev => prev.filter(fish => fish.id !== id));
     }
 
-    const timer = useTimer({ delay: 300, startImmediately: false }, addObject);
+    const timer = useTimer({ delay: GAME[level].FALL_INTERVAL, startImmediately: false }, addObject);
 
     const handleGameOver = () => {
-        setPlaying(false);
         timer.stop();
-        setTimeout(endGame, GAME.FALL_TIME + GAME.FROZEN_TIME);
-    }
-
-    const handleStart = () => {
-        API.post('/play/start', { userid: initData?.user?.id })
-            .then(res => {
-                if (res.data.success) {
-                    setTicket(res.data.ticket);
-                    startGame();
-                } else {
-                    toast.error(res.data.msg);
-                }
-            }).catch(err => {
-                console.error(err);
-                toast.error(err.message);
-            });
+        setTimeout(endGame, GAME[level].FALL_TIME + GAME[level].FROZEN_TIME);
     }
 
     const clickFish = () => {
@@ -101,13 +89,11 @@ const Play = () => {
             timer.resume();
             countdown.current.start();
             setObjects(prev => prev.map(prev => ({ ...prev, status: "falling" })));
-        }, GAME.FROZEN_TIME);
+        }, GAME[level].FROZEN_TIME);
     }
 
     const startGame = () => {
-        setEndTime(Date.now() + GAME.DURATION);
-        setPlaying(true);
-        setShowStartButton(false);
+        setEndTime(Date.now() + GAME[level].DURATION);
         countdown.current.start();
         timer.start();
     }
@@ -118,9 +104,9 @@ const Play = () => {
             .then(res => {
                 if (res.data.success) {
                     toast.success(`You got ${ claimed.current } fishes!`);
-                    setEndTime(Date.now() + GAME.DURATION);
+                    navigate('/home');
+                    setEndTime(Date.now() + GAME[level].DURATION);
                     claimed.current = 0;
-                    setShowStartButton(true);
                 } else {
                     toast.error(res.data.msg);
                 }
@@ -131,9 +117,7 @@ const Play = () => {
     }
 
     useEffect(() => {
-        API.get(`/users/get/${initData?.user?.id}`).then(res => {
-            setTicket(res.data.ticket);
-        }).catch(console.error);
+        setTimeout(startGame, 3000);
     }, []);
 
     return (
@@ -141,22 +125,20 @@ const Play = () => {
             <div className="flex items-center justify-center w-screen h-screen overflow-hidden">
                 { showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" /> }
                 <div className="absolute z-10 left-[29px] top-[29px] w-[107px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
-                    <img className={`w-[19px] h-[19px] ${playing ? 'animate-spin' : 'animate-none'}`} src="/imgs/clock.svg" alt="" />
+                    <img className={`w-[19px] h-[19px] ${countdown.current?.isStarted() ? 'animate-spin' : 'animate-none'}`} src="/imgs/clock.svg" alt="" />
                     <Countdown ref={countdown} date={endTime} onComplete={handleGameOver} renderer={Renderer} autoStart={false} />
                 </div>
-                <div className="absolute z-10 right-[29px] top-[29px] px-[8px] h-[46px] rounded-[10px] bg-[#FFB200B2] flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
-                    <img className="w-[21px] h-[21px]" src="/imgs/point.svg" alt="" />
-                    <span className="font-bold text-[20px]">{ ticket }</span>
+                <div className="absolute z-10 right-[29px] top-[29px] w-[60px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
                     <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
                     <span className="font-bold text-[20px]">{ claimed.current }</span>
                 </div>
-                { showStartButton && <div className="z-10 w-[169px] h-[169px] rounded-full bg-gradient-to-b from-[#BEC1AEA6] to-[#F0DD99A6] flex items-center justify-center">
-                    <img onClick={handleStart} className="cursor-pointer w-[118px] h-[118px]" src="/imgs/tg-fish.svg" alt="" />
-                </div> }
+                <button className="z-10 absolute w-[66px] h-[68px] top-[82px] right-[24px]">
+                    <img className="" src="/imgs/goldfish.png" alt="" />
+                </button>
                 { objects.map((object, _) => {
-                    if (object.type === "fish") return <Fish key={object.id} left={object.left} status={object.status} callback={object.callback} />
-                    if (object.type === "bomb") return <Bomb key={object.id} left={object.left} status={object.status} callback={object.callback} />
-                    if (object.type === "snow") return <Snow key={object.id} left={object.left} status={object.status} callback={object.callback} />
+                    if (object.type === "fish") return <Fish key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
+                    if (object.type === "bomb") return <Bomb key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
+                    if (object.type === "snow") return <Snow key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
                 }) }
             </div>
         </Fragment>
