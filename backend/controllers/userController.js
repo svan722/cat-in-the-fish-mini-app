@@ -6,6 +6,7 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/User');
 const Follow = require('../models/Follow');
 const BoostItem = require('../models/BoostItem');
+const BoostPurchaseHistory = require('../models/BoostPurchaseHistory');
 
 const logger = require('../helper/logger');
 const { BONUS, TELEGRAM, LEADERBOARD_SHOW_USER_COUNT } = require('../helper/constants');
@@ -313,43 +314,61 @@ const getLeaderboard = async (req, res) => {
 
 const purchaseBoost = async (req, res) => {
   const { userid, boostid } = req.body;
+  const quantity = 1;
   const user = await User.findOne({ userid });
   if(!user) {
     return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
   }
-  const currentTime = new Date();
-  for (const boost of user.boosts) {
-    if (currentTime < boost.endTime) {
-      return res.status(StatusCodes.OK).json({success: false, status: 'exist', msg: 'You already buy boost item!'});
-    }
-  }
-  const boostItem = await BoostItem.findById(boostid);
+  
+  const boostItem = await BoostItem.findOne({boostid});
   if(!boostItem) {
     return res.status(StatusCodes.OK).json({success: false, status: 'noboostitem', msg: 'Not found boost item!'});
   }
 
-  var userBoost = null;
-  switch (boostItem.type) {
-    case 'one-time':
-      userBoost = { item: boostItem._id };
-      break;
-    case 'many-time':
-      userBoost = { item: boostItem._id, remainingUses: boostItem.maxUses };
-      break;
-    case 'forever':
-      userBoost = { item: boostItem._id };
-      break;
-    case 'period':
-      const currentTime = new Date();
-      const endTime = new Date(currentTime.getTime() + boostItem.period * 24 * 60 * 60 * 1000);
-      userBoost = { item: boostItem._id, endTime };
-      break;
+  // Create boost purchase history
+  const purchaseHistory = new BoostPurchaseHistory({
+    user: user._id,
+    boostItem: boostItem._id,
+    quantity,
+  });
+  await purchaseHistory.save();
+
+  // Update user boosts
+  const boostIndex = user.boosts.findIndex(b => b.item.equals(boostItem._id));
+  if (boostIndex !== -1) {
+      user.boosts[boostIndex].usesRemaining += quantity;
+  } else {
+      user.boosts.push({
+          item: boostItem._id,
+          usesRemaining: quantity,
+      });
   }
-  if(userBoost) {
-    user.boosts.push(userBoost);
-    await user.save();
+  await user.save();
+  
+  return res.status(StatusCodes.OK).json({success: true, msg: 'Purchase boost successfully!'});
+}
+
+const useBoost = async (req, res) => {
+  const { userid, boostid } = req.body;
+  const user = await User.findOne({ userid });
+  if(!user) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
   }
-  return res.status(StatusCodes.OK).json({success: true, boost: userBoost, msg: 'Purchase boost successfully!'});
+
+  const boost = user.boosts.find(b => b.item.equals(boostid));
+  if (!boost || boost.usesRemaining <= 0) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'noboostitem', msg: 'Not found boost item!'});
+  }
+
+  // Use the boost
+  user.fish += boost.bonus;
+  boost.usesRemaining -= 1;
+  if (boost.usesRemaining === 0) {
+    user.boosts = user.boosts.filter(b => !b.item.equals(boostid));
+  }
+  await user.save();
+  
+  return res.status(StatusCodes.OK).json({success: true, msg: 'Use boost successfully!'});
 }
 
 const getAllBoost = async (req, res) => {
@@ -358,16 +377,18 @@ const getAllBoost = async (req, res) => {
 }
 
 const addBoost = async (req, res) => {
-  const { userid, name, title, period, price } = req.body;
-  const boostItem = await BoostItem.findOne({name});
+  const { boostid, title, description, maxUses, price, bonus } = req.body;
+  const boostItem = await BoostItem.findOne({boostid});
   if(boostItem) {
     return res.status(StatusCodes.OK).json({success: false, status: 'exist', msg: 'Boost name already exist!'});
   }
   await BoostItem.create({
-    name,
+    boostid,
     title,
-    period,
-    price
+    description,
+    maxUses,
+    price,
+    bonus
   });
   return res.status(StatusCodes.OK).json({status: true, msg: 'Boost add success!'});
 }
@@ -378,45 +399,39 @@ const getMyBoost = async (req, res) => {
   if(!user) {
     return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
   }
+  
+  return res.status(StatusCodes.OK).json({success: true, boosts: user.boosts});
+}
 
-  const result = await User.aggregate([
-    { $match: { 'boosts.item': { $ne: null } } }, // Filter users with boosts
-    { $unwind: '$boosts' }, // Deconstruct boosts array
+const getTotalBoostHistory = async (req, res) => {
+  const result = await BoostPurchaseHistory.aggregate([
     {
       $lookup: {
-        from: 'boostitems', // The collection name for BoostItem
-        localField: 'boosts.item',
+        from: 'boostitems', // The name of the BoostItem collection
+        localField: 'boostItem',
         foreignField: '_id',
-        as: 'boostDetails'
-      }
+        as: 'boostDetails',
+      },
     },
-    { $unwind: '$boostDetails' }, // Deconstruct boostDetails array
+    {
+      $unwind: '$boostDetails', // Unwind to access boost details
+    },
     {
       $group: {
         _id: null,
-        totalUsers: { $addToSet: '$userid' }, // Unique user IDs
-        totalPrice: { $sum: '$boostDetails.price' } // Sum of prices
-      }
+        totalUniqueUsers: { $addToSet: '$user' }, // Collect unique users
+        totalPrice: { $sum: { $multiply: ['$quantity', '$boostDetails.price'] } }, // Calculate total price
+      },
     },
     {
       $project: {
-        totalUsersCount: { $size: '$totalUsers' },
-        totalBoostsPrice: '$totalPrice'
-      }
-    }
+        _id: 0,
+        totalUniqueUsers: { $size: '$totalUniqueUsers' }, // Count unique users
+        totalPrice: 1, // Include total price
+      },
+    },
   ]);
-  const total = {
-    usersCount: result.length > 0 ? result[0].totalUsersCount.toString() : 0,
-    price: result.length > 0 ? result[0].totalBoostsPrice.toString() : 0
-  }
-
-  const currentTime = new Date();
-  for (const boost of user.boosts) {
-    if (currentTime < boost.endTime) {
-      return res.status(StatusCodes.OK).json({success: true, boost, total});
-    }
-  }
-  return res.status(StatusCodes.OK).json({success: false, status: 'noboost', total, msg: 'You did not buy boost!'});
+  return res.status(StatusCodes.OK).json({success: true, result});
 }
 module.exports = {
   getUser,
@@ -438,7 +453,9 @@ module.exports = {
   claimDailyReward,
 
   purchaseBoost,
+  useBoost,
   getAllBoost,
   addBoost,
   getMyBoost,
+  getTotalBoostHistory,
 };

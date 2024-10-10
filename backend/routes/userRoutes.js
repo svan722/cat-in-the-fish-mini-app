@@ -23,9 +23,11 @@ const {
     claimDailyReward,
 
     purchaseBoost,
+    useBoost,
     getAllBoost,
     addBoost,
     getMyBoost,
+    getTotalBoostHistory,
 
 } = require('../controllers/userController');
 
@@ -47,8 +49,10 @@ router.get('/avatar/:userid', getAvatarImage);
 router.post('/claim/daily', authenticateUser, claimDailyReward);
 
 router.post('/boost/purchase', authenticateUser, purchaseBoost);
+router.post('/boost/use', authenticateUser, useBoost);
 router.get('/boost/getall', authenticateUser, getAllBoost);
 router.post('/boost/add', authenticateUser, addBoost);
 router.get('/boost/getmy/:userid', authenticateUser, getMyBoost);
+router.get('/boost/gethistory', authenticateUser, getTotalBoostHistory);
 
 module.exports = router;

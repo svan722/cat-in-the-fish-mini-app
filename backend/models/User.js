@@ -35,6 +35,7 @@ const UserSchema = new mongoose.Schema({
   boosts: [{
     item: { type: mongoose.Schema.Types.ObjectId, ref: 'BoostItem' },
     endTime: { type: Date, default: Date.now },
+    usesRemaining: { type: Number, default: 1 },
   }],
 });
 
