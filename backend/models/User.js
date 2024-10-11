@@ -24,6 +24,8 @@ const UserSchema = new mongoose.Schema({
   
   ticket: { type: Number, default: 1 },
   fish: { type: Number, default: 0 },
+  golden: { type: Number, default: 0 },
+  super: { type: Number, default: 0 },
 
   totalScore: { type: Number, default: 0 },
   weeklyScore: { type: Number, default: 0 },

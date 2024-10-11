@@ -1,9 +1,8 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import API from "@/libs/API";
 import { Link } from "@/components/Link";
 import { useApp } from "@/providers/AppProvider";
 import { useInitData } from "@telegram-apps/sdk-react";
-import { Modal, Button, Placeholder } from "@telegram-apps/telegram-ui";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -23,22 +22,6 @@ const Home = () => {
             setTicket(res.data.ticket);
         }).catch(console.error);
     }, []);
-
-    const handleSwapClick = (fish: number) => {
-        API.post('/play/swap', { userid: initData?.user?.id, fish })
-            .then(res => {
-                if (res.data.success) {
-                    toast.success('You got tickets.');
-                    setTicket(res.data.ticket);
-                    setFish(res.data.fish);
-                } else {
-                    toast.error(res.data.msg);
-                }
-            }).catch(err => {
-                console.error(err);
-                toast.error(err.message);
-            });
-    }
 
     const handleClickLevel = (lvl: Level) => {
         setLevel(lvl);
@@ -78,32 +61,16 @@ const Home = () => {
             <div className="mt-[24px] w-[169px] h-[169px] rounded-full bg-gradient-to-b from-[#BEC1AEA6] to-[#F0DD99A6] flex items-center justify-center">
                 <img className="w-[118px] h-[118px]" src="/imgs/tg-fish.svg" alt="" />
             </div>
-            <Modal
-                header={<Modal.Header />}
-                trigger={
-                    <button className="mt-[24px] flex justify-center items-center gap-3 rounded-full bg-primary w-[92px] h-[45px]">
-                        <div className="w-[23px] h-[23px] rounded-full bg-white flex items-center justify-center">
-                            <img className="w-[13px] h-[6px]" src="/imgs/point.svg" alt="" />
-                        </div>
-                        <span className="font-bold text-[20px]">{ticket}</span>
-                    </button>
-                }
-            >
-                <Placeholder
-                    header={<span className="text-primary">Get Ticket with fish</span>}
-                    action={
-                        <Fragment>
-                            <Button onClick={() => handleSwapClick(20)} size="m" stretched>Get 1 Ticket with 20 Fish</Button>
-                            <Button onClick={() => handleSwapClick(50)} size="m" stretched>Get 3 Ticket with 50 Fish</Button>
-                            <Button onClick={() => handleSwapClick(100)} size="m" stretched>Get 5 Ticket with 100 Fish</Button>
-                        </Fragment>
-                    }
-                />
-            </Modal>
+            <Link to="/shop" className="mt-[24px] flex justify-center items-center gap-3 rounded-full bg-primary w-[92px] h-[45px]">
+                <div className="w-[23px] h-[23px] rounded-full bg-white flex items-center justify-center">
+                    <img className="w-[13px] h-[6px]" src="/imgs/point.svg" alt="" />
+                </div>
+                <span className="font-bold text-[20px]">{ticket}</span>
+            </Link>
             <div className="flex mt-[24px] gap-[13px]">
-                <button onClick={() => handleClickLevel("easy")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${ level === "easy" ? 'bg-primary' : 'bg-[#8099A6]' }`}>EASY</button>
-                <button onClick={() => handleClickLevel("medium")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[20px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${ level === "medium" ? 'bg-primary' : 'bg-[#8099A6]' }`}>MEDIUM</button>
-                <button onClick={() => handleClickLevel("hard")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${ level === "hard" ? 'bg-primary' : 'bg-[#8099A6]' }`}>HARD</button>
+                <button onClick={() => handleClickLevel("easy")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "easy" ? 'bg-primary' : 'bg-[#8099A6]'}`}>EASY</button>
+                <button onClick={() => handleClickLevel("medium")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[20px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "medium" ? 'bg-primary' : 'bg-[#8099A6]'}`}>MEDIUM</button>
+                <button onClick={() => handleClickLevel("hard")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "hard" ? 'bg-primary' : 'bg-[#8099A6]'}`}>HARD</button>
             </div>
             <button onClick={handleStart} className="mt-[35px] rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] w-full h-[64px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100">PLAY GAMES</button>
             <div className="mt-[48px] w-full h-[79px] grid grid-cols-4 items-center justify-center px-[20px] rounded-[16px] bg-[#8AA6B799] backdrop-blur-md">

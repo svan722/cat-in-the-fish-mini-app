@@ -57,8 +57,42 @@ const addPlayedFish = async (req, res) => {
     await user.save();
     return res.status(StatusCodes.OK).json({success: true, ticket: user.ticket, fish: user.fish});
 }
+const purchaseItems = async (req, res) => {
+  const { userid, type } = req.body;
+  var user = await User.findOne({ userid });
+  if(!user) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no user!'});
+  }
+  if(type === "golden") {
+    user.golden ++;
+    await user.save();
+  }
+  if(type === "super") {
+    user.super ++;
+    await user.save();
+  }
+  return res.status(StatusCodes.OK).json({success: true, golden: user.golden, super: user.super});
+}
+const useItem = async (req, res) => {
+  const { userid, type } = req.body;
+  var user = await User.findOne({ userid });
+  if(!user) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no user!'});
+  }
+  if(type === "golden") {
+    user.golden --;
+    await user.save();
+  }
+  if(type === "super") {
+    user.super --;
+    await user.save();
+  }
+  return res.status(StatusCodes.OK).json({success: true, golden: user.golden, super: user.super});
+}
 module.exports = {
     starFishing,
     swapTicket,
     addPlayedFish,
+    purchaseItems,
+    useItem,
 };

@@ -1,7 +1,7 @@
 import { useInitData, useUtils } from "@telegram-apps/sdk-react";
 import { toast } from "react-toastify";
 
-import { LINK } from "@/libs/contant";
+import { LINK } from "@/libs/constants";
 import { Link } from "@/components/Link";
 import Button from "@/components/Button";
 

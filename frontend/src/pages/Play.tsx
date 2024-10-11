@@ -11,7 +11,7 @@ import Snow from "@/components/objects/Snow";
 import Bomb from "@/components/objects/Bomb";
 
 import API from "@/libs/API";
-import { GAME } from "@/libs/contant";
+import { GAME } from "@/libs/constants";
 
 const Renderer = (props: CountdownRenderProps) => {
     return (
@@ -31,7 +31,13 @@ const Play = () => {
     const [endTime, setEndTime] = useState(Date.now() + GAME[level].DURATION);
     const [objects, setObjects] = useState<ObjectInfo[]>([]);
     const [showBombEffect, setShowBombEffect] = useState(false);
-    
+    const [showGoldEffect, setShowGoldEffect] = useState(false);
+    const [showSuperEffect, setShowSuperEffect] = useState(false);
+
+    const [goldenFish, setGoldenFish] = useState(false);
+    const [superFish, setSuperFish] = useState(false);
+    const [usedGolden, setUsedGolden] = useState(0);
+    const [usedSuper, setUsedSuper] = useState(false);
 
     const addObject = () => {
         const random = Math.random();
@@ -116,7 +122,43 @@ const Play = () => {
             });
     }
 
+    const handleGoldenFish = () => {
+        countdown.current.pause();
+        timer.pause();
+        setObjects([]);
+        claimed.current += 10;
+        setShowGoldEffect(true);
+        setUsedGolden(prev => prev + 1);
+        setTimeout(() => {
+            setShowGoldEffect(false);
+            timer.resume();
+            countdown.current.start();
+        }, 3000);
+
+        if (usedGolden === 0)API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
+    }
+
+    const handleSuperFish = () => {
+        countdown.current.pause();
+        timer.pause();
+        setObjects([]);
+        claimed.current += 50;
+        setShowSuperEffect(true);
+        setUsedSuper(true);
+        setTimeout(() => {
+            setShowSuperEffect(false);
+            timer.resume();
+            countdown.current.start();
+        }, 3000);
+
+        API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
+    }
+
     useEffect(() => {
+        API.get(`/users/get/${initData?.user?.id}`).then(res => {
+            setGoldenFish(!!res.data.golden);
+            setSuperFish(!!res.data.super);
+        }).catch(console.error);
         setTimeout(startGame, 3000);
     }, []);
 
@@ -124,17 +166,25 @@ const Play = () => {
         <Fragment>
             <div className="flex items-center justify-center w-screen h-screen overflow-hidden">
                 { showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" /> }
+                { showGoldEffect && <div className="absolute inset-0 z-50 bg-yellow-500 animate-bomb" /> }
+                { showSuperEffect && <div className="absolute inset-0 z-50 [background:conic-gradient(red,yellow,green,cyan,blue,magenta,red)] animate-bomb" /> }
                 <div className="absolute z-10 left-[29px] top-[29px] w-[107px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
                     <img className={`w-[19px] h-[19px] ${countdown.current?.isStarted() ? 'animate-spin' : 'animate-none'}`} src="/imgs/clock.svg" alt="" />
                     <Countdown ref={countdown} date={endTime} onComplete={handleGameOver} renderer={Renderer} autoStart={false} />
                 </div>
-                <div className="absolute z-10 right-[29px] top-[29px] w-[60px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
-                    <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
-                    <span className="font-bold text-[20px]">{ claimed.current }</span>
+                <div className="absolute z-10 right-[29px] top-[29px] flex flex-col items-center gap-2">
+                    <div className="w-[60px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
+                        <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
+                        <span className="font-bold text-[20px]">{ claimed.current }</span>
+                    </div>
+                    { goldenFish && (usedGolden < 2) && <button onClick={handleGoldenFish} className="relative w-[66px] h-[68px]">
+                        <img className="" src="/imgs/goldfish.png" alt="" />
+                        <span className="absolute bottom-0 right-0">x{2 - usedGolden}</span>
+                    </button> }
+                    { superFish && !usedSuper && <button onClick={handleSuperFish} className="w-[66px] h-[68px]">
+                        <img className="" src="/imgs/rainbow.png" alt="" />
+                    </button> }
                 </div>
-                <button className="z-10 absolute w-[66px] h-[68px] top-[82px] right-[24px]">
-                    <img className="" src="/imgs/goldfish.png" alt="" />
-                </button>
                 { objects.map((object, _) => {
                     if (object.type === "fish") return <Fish key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
                     if (object.type === "bomb") return <Bomb key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />

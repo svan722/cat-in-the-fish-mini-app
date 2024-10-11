@@ -5,7 +5,7 @@ import Countdown from 'react-countdown';
 
 import { Modal, Placeholder, Button } from '@telegram-apps/telegram-ui';
 import API from '@/libs/API';
-import { LINK, PLATFORM } from '@/libs/contant';
+import { LINK, PLATFORM } from '@/libs/constants';
 
 const Task = () => {
     const initData = useInitData();
