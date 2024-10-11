@@ -1,10 +1,13 @@
 import { ObjectProps } from "@/libs/types";
 import { useState } from "react";
+import { Howl } from "howler";
 
 const Bomb = ({ left, callback, status, fallTime }: ObjectProps) => {
     const [clicked, setClicked] = useState(false);
+    const tap = new Howl({ src: ['/mp3/bomb.mp3'] });
     const handleClick = () => {
         if (clicked) return;
+        tap.play();
         setClicked(true);
         callback && callback();
     }

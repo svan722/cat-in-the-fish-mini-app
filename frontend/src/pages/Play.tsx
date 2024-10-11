@@ -13,6 +13,8 @@ import Bomb from "@/components/objects/Bomb";
 import API from "@/libs/API";
 import { GAME } from "@/libs/constants";
 
+import { Howl } from "howler";
+
 const Renderer = (props: CountdownRenderProps) => {
     return (
         <span className="font-bold text-[20px]">{ props.minutes.toString().padStart(2, '0') } : { props.seconds.toString().padStart(2, '0') }</span>
@@ -20,6 +22,9 @@ const Renderer = (props: CountdownRenderProps) => {
 }
 
 const Play = () => {
+    const superSound = new Howl({ src: ['/mp3/super.mp3'] });
+    const goldSound = new Howl({ src: ['/mp3/gold.mp3'] });
+    const snowSound = new Howl({ src: ['/mp3/freeze.mp3'] });
     const location = useLocation();
     const navigate = useNavigate();
     const initData = useInitData();
@@ -88,6 +93,7 @@ const Play = () => {
     }
 
     const clickSnow = () => {
+        snowSound.play();
         countdown.current.pause();
         timer.pause();
         setObjects(prev => prev.map(prev => ({ ...prev, status: "stopped" })));
@@ -123,6 +129,7 @@ const Play = () => {
     }
 
     const handleGoldenFish = () => {
+        goldSound.play();
         countdown.current.pause();
         timer.pause();
         setObjects([]);
@@ -135,10 +142,11 @@ const Play = () => {
             countdown.current.start();
         }, 3000);
 
-        if (usedGolden === 0)API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
+        API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
     }
 
     const handleSuperFish = () => {
+        superSound.play();
         countdown.current.pause();
         timer.pause();
         setObjects([]);
