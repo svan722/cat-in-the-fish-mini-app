@@ -93,7 +93,7 @@ const Play = () => {
     }
 
     const clickSnow = () => {
-        snowSound.play();
+        snowSound.play(); 
         countdown.current.pause();
         timer.pause();
         setObjects(prev => prev.map(prev => ({ ...prev, status: "stopped" })));
