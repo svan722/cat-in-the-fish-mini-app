@@ -6,10 +6,10 @@ import Avatar from "@/components/Avatar";
 import { Link } from "@/components/Link";
 
 const Leaderboard = () => {
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<any[]>([]);
     // const [type, setType] = useState("total");
-    // const [selfRank, setSelfRank] = useState(-1);
-    // const [self, setSelf] = useState(null);
+    const [selfRank, setSelfRank] = useState(-1);
+    const [self, setSelf] = useState<any>({});
 
     const [userCount, setUserCount] = useState(0);
     // const [isCounting, setCounting] = useState(false);
@@ -28,8 +28,8 @@ const Leaderboard = () => {
         API.get(`/users/ranking/${initData?.user?.id}/total`)
             .then(res => {
                 setUsers(res.data.users);
-                // setSelfRank(res.data.rank);
-                // setSelf(res.data.self);
+                setSelfRank(res.data.rank);
+                setSelf(res.data.self);
             }).catch(console.error);
     }, [])
     
@@ -40,30 +40,30 @@ const Leaderboard = () => {
                 <div className="flex gap-[10px]">
                     <Avatar width={32} height={32} />
                     <div className="flex flex-col justify-center gap-[6px]">
-                        <div className="text-[15px] leading-none">Lofi_k</div>
+                        <div className="text-[15px] leading-none">{ self.firstname }</div>
                         <div className="flex justify-center items-center gap-[5px]">
-                            <span className="text-[12px] leading-none">1,000</span>
+                            <span className="text-[12px] leading-none">{ self.fish?.toLocaleString() }</span>
                             <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
                         </div>
                     </div>
                 </div>
-                <div>#784773</div>
+                <div>#{ selfRank }</div>
             </div>
             <h2 className="text-[20px] mt-[36px] mb-[20px]">{userCount} holders</h2>
             <div className="h-[calc(100vh-330px)] overflow-y-auto flex flex-col gap-[28px]">
-                {users.map((_, index) => 
-                    <div key={index} className="flex items-center justify-between pr-[20px]">
-                        <div className="flex gap-[10px] items-center">
-                            <Avatar width={32} height={32} />
-                            <div className="flex flex-col justify-center gap-[6px]">
-                                <div className="text-[15px] leading-none">Lofi_k</div>
+                {users.map((user, index) => 
+                    <div key={index} className={`flex items-center justify-between pr-[20px]`}>
+                        <div className="flex gap-[10px] items-center px-1">
+                            <Avatar width={32} height={32} className={selfRank === index + 1 ? 'outline outline-yellow-500' : ''} userid={user.userid} username={user.username} />
+                            <div className="flex flex-col items-start gap-[6px]">
+                                <div className={`text-[15px] leading-none w-[200px] overflow-hidden text-ellipsis whitespace-nowrap ${selfRank === index + 1 ? 'text-yellow-300' : ''}`}>{ user.firstname }</div>
                                 <div className="flex justify-center items-center gap-[5px]">
-                                    <span className="text-[12px] leading-none">1,000</span>
+                                    <span className="text-[12px] leading-none">{ user.fish.toLocaleString() }</span>
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
                                 </div>
                             </div>
                         </div>
-                        <div>#784773</div>
+                        <div className={selfRank === index + 1 ? 'text-yellow-300' : ''}>#{index + 1}</div>
                     </div>
                 )}
             </div>

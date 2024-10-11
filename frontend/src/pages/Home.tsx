@@ -43,7 +43,7 @@ const Home = () => {
     }
 
     return (
-        <div className="flex flex-col items-center w-screen min-h-screen pt-[23px] pb-[29px] px-[17px]">
+        <div className="flex flex-col items-center justify-between w-screen h-screen py-[20px] px-[17px]">
             <div className="flex items-center gap-[5px] mx-auto">
                 <button onClick={app?.toggleMusic} className={`w-[45px] h-[45px] border border-[#C6F0FF85] rounded-full bg-gradient-to-b from-[#38AFE3B0] to-[#1E94D3B0] flex items-center justify-center hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200`}>
                     {app?.volume === "on" ? <img className="w-[27px] h-[27px]" src="/imgs/unmute.svg" alt="" /> : <img className="w-[27px] h-[27px]" src="/imgs/mute.svg" alt="" />}
@@ -54,26 +54,26 @@ const Home = () => {
                 </div>
                 <Link to="/info" className="w-[45px] h-[45px] flex items-center justify-center border border-[#C6F0FF85] rounded-full bg-gradient-to-b from-[#38AFE3B0] to-[#1E94D3B0] text-[40px] leading-none rotate-180 font-extrabold hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200">!</Link>
             </div>
-            <div className="text-center mt-[20px]">
+            <div className="text-center">
                 <p className="text-[10px]">Your Balance</p>
                 <p className="text-[21px] leading-none font-extrabold">{fish}</p>
             </div>
-            <div className="mt-[24px] w-[169px] h-[169px] rounded-full bg-gradient-to-b from-[#BEC1AEA6] to-[#F0DD99A6] flex items-center justify-center">
+            <div className="w-[169px] h-[169px] rounded-full bg-gradient-to-b from-[#BEC1AEA6] to-[#F0DD99A6] flex items-center justify-center">
                 <img className="w-[118px] h-[118px]" src="/imgs/tg-fish.svg" alt="" />
             </div>
-            <Link to="/shop" className="mt-[24px] flex justify-center items-center gap-3 rounded-full bg-primary w-[92px] h-[45px]">
+            <Link to="/shop" className="flex justify-center items-center gap-3 rounded-full bg-primary w-[92px] h-[45px]">
                 <div className="w-[23px] h-[23px] rounded-full bg-white flex items-center justify-center">
                     <img className="w-[13px] h-[6px]" src="/imgs/point.svg" alt="" />
                 </div>
                 <span className="font-bold text-[20px]">{ticket}</span>
             </Link>
-            <div className="flex mt-[24px] gap-[13px]">
+            <div className="flex gap-[13px]">
                 <button onClick={() => handleClickLevel("easy")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "easy" ? 'bg-primary' : 'bg-[#8099A6]'}`}>EASY</button>
                 <button onClick={() => handleClickLevel("medium")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[20px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "medium" ? 'bg-primary' : 'bg-[#8099A6]'}`}>MEDIUM</button>
                 <button onClick={() => handleClickLevel("hard")} className={`flex justify-center items-center gap-3 rounded-full h-[45px] px-[30px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200 ${level === "hard" ? 'bg-primary' : 'bg-[#8099A6]'}`}>HARD</button>
             </div>
-            <button onClick={handleStart} className="mt-[35px] rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] w-full h-[64px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100">PLAY GAMES</button>
-            <div className="mt-[48px] w-full h-[79px] grid grid-cols-4 items-center justify-center px-[20px] rounded-[16px] bg-[#8AA6B799] backdrop-blur-md">
+            <button onClick={handleStart} className="rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] w-full h-[64px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100">PLAY GAMES</button>
+            <div className="w-full h-[79px] grid grid-cols-4 items-center justify-center px-[20px] rounded-[16px] bg-[#8AA6B799] backdrop-blur-md">
                 <Link to="/" className="flex flex-col items-center gap-[4px] fill-primary hover:scale-125 transition-all duration-200">
                     <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6.9148 21.8968H11.1697V15.1157H16.4895V21.8968H20.7444V11.5246L13.8296 6.29474L6.9148 11.5246V21.8968ZM5.76233 23.0493V10.9484L13.8296 4.85416L21.8969 10.9484V23.0493H15.337V16.2682H12.3222V23.0493H5.76233Z" />

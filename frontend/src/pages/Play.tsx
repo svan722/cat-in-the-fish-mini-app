@@ -44,6 +44,8 @@ const Play = () => {
     const [usedGolden, setUsedGolden] = useState(0);
     const [usedSuper, setUsedSuper] = useState(false);
 
+    const [counter, setCounter] = useState('3');
+
     const addObject = () => {
         const random = Math.random();
         let type: ObjectType;
@@ -167,12 +169,27 @@ const Play = () => {
             setGoldenFish(!!res.data.golden);
             setSuperFish(!!res.data.super);
         }).catch(console.error);
-        setTimeout(startGame, 3000);
+        
+        setTimeout(() => {
+            setCounter('2');
+            setTimeout(() => {
+                setCounter('1');
+                setTimeout(() => {
+                    setCounter('GO!');
+                    setTimeout(() => {
+                        setCounter('');
+                        startGame();
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }, 1000);
+        // setTimeout(startGame, 3000);
     }, []);
 
     return (
         <Fragment>
             <div className="flex items-center justify-center w-screen h-screen overflow-hidden">
+                { counter && <div className="absolute inset-0 flex items-center justify-center font-bold text-[150px]">{ counter }</div> }
                 { showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" /> }
                 { showGoldEffect && <div className="absolute inset-0 z-50 bg-yellow-500 animate-bomb" /> }
                 { showSuperEffect && <div className="absolute inset-0 z-50 [background:conic-gradient(red,yellow,green,cyan,blue,magenta,red)] animate-bomb" /> }
