@@ -12,19 +12,21 @@ const Task = () => {
     const utils = useUtils();
 
     const [dailyRemainSecond, setDailyRemainSecond] = useState(0);
-    const [isJoinedTelegramGroup, setJoinedTelegramGroup] = useState(false);
+    // const [isJoinedTelegramGroup, setJoinedTelegramGroup] = useState(false);
     const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
     // const [isFollowingYouTube, setFollowingYouTube] = useState(false);
     const [isFollowingX, setFollowingX] = useState(false);
     const [isInviteFive, setInviteFive] = useState(false);
-    const [dailyReward, setDailyReward] = useState(100);
+    const [dailyReward, setDailyReward] = useState(1000);
+    const [isRetweetX, setRetweetX] = useState(false);
 
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
             setFollowingX(res.data.xFollowed);
+            setRetweetX(res.data.xTweet);
             // setFollowingYouTube(res.data.youtubeSubscribed);
             setJoinedTelegramChannel(res.data.telegramChannelJoined);
-            setJoinedTelegramGroup(res.data.telegramGroupJoined);
+            // setJoinedTelegramGroup(res.data.telegramGroupJoined);
             setInviteFive(res.data.inviteFive);
         }).catch(console.error);
         handleClaimDailyReward();
@@ -44,19 +46,18 @@ const Task = () => {
         }).catch(console.error);
     }
 
-    const handleJoinTelegramGroup = () => {
-        API.post('/users/jointg', {
-            userid: initData?.user?.id,
-            type: 'group'
-        }).then(res => {
-            if(res.data.success) {
-                setJoinedTelegramGroup(true);
-                // setOpenGroupModal(false);
-                toast.success(res.data.msg);
-            }
-            else toast.error(res.data.msg);
-        }).catch(console.error);
-    }
+    // const handleJoinTelegramGroup = () => {
+    //     API.post('/users/jointg', {
+    //         userid: initData?.user?.id,
+    //         type: 'group'
+    //     }).then(res => {
+    //         if(res.data.success) {
+    //             setJoinedTelegramGroup(true);
+    //             toast.success(res.data.msg);
+    //         }
+    //         else toast.error(res.data.msg);
+    //     }).catch(console.error);
+    // }
 
     const handleJoinTelegramChannel = () => {
         API.post('/users/jointg', {
@@ -65,7 +66,6 @@ const Task = () => {
         }).then(res => {
             if(res.data.success) {
                 setJoinedTelegramChannel(true);
-                // setOpenChannelModal(false);
                 toast.success(res.data.msg);
             }
             else toast.error(res.data.msg);
@@ -76,11 +76,20 @@ const Task = () => {
         API.post('/users/followx', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
             if(res.data.success) {
                 setFollowingX(true);
-                // setOpenFollowXModal(false);
                 toast.success(res.data.msg);
             }
             else toast.error(res.data.msg);
         }).catch(console.error);
+    }
+
+    const handleRetweetX = () => {
+        API.post('/users/tweet', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
+            if(res.data.success) {
+                setRetweetX(true);
+                toast.success(res.data.msg);
+            }
+            else toast.error(res.data.msg);
+        }).catch(err => console.error(err));
     }
 
     // const handleFollowYoutube = () => {
@@ -94,9 +103,9 @@ const Task = () => {
     //     }).catch(console.error);
     // }
 
-    const handleTGGroupLink = () => {
-        utils.openTelegramLink(LINK.TELEGRAM_GROUP);
-    }
+    // const handleTGGroupLink = () => {
+    //     utils.openTelegramLink(LINK.TELEGRAM_GROUP);
+    // }
 
     const handleTGChannelLink = () => {
         utils.openTelegramLink(LINK.TELEGRAM_CHANNEL);
@@ -105,6 +114,11 @@ const Task = () => {
     const handleXLink = () => {
         API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.X }).catch(console.error);
         utils.openLink(LINK.X);
+    }
+
+    const handleRetweekLink = () => {
+        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.TWEET }).catch(console.error);
+        utils.openLink(LINK.TWEET);
     }
 
     // const handleYoutubeLink = () => {
@@ -150,6 +164,34 @@ const Task = () => {
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
+                            <div className="w-[48px] h-[48px] rounded-[8px] bg-[#272B2F] flex justify-center items-center">
+                                <img src="/imgs/x-icon.svg" alt="" className="w-[26px] h-[24px]" />
+                            </div>
+                            <div className="flex flex-col justify-center gap-[6px]">
+                                <div className="text-[15px] leading-none">Retweet our blog</div>
+                                <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                                    <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                    <span className="text-[12px] leading-none">+ 1000</span>
+                                </div>
+                            </div>
+                        </div>
+                        <Modal
+                            header={<Modal.Header />}
+                            trigger={<button disabled={isRetweetX} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
+                        >
+                            <Placeholder
+                                header="Retweet our blog"
+                                action={
+                                    <Fragment>
+                                        <Button onClick={handleRetweekLink} size="m" stretched>Retweet</Button>
+                                        <Button onClick={handleRetweetX} size="m" stretched>Complete</Button>
+                                    </Fragment>
+                                }
+                            />
+                        </Modal>
+                    </div>
+                    {/* <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                        <div className="flex gap-[10px]">
                             <div className="w-[48px] h-[48px] rounded-[8px] bg-[#2DA9E6] flex justify-center items-center">
                                 <img src="/imgs/tg-icon.svg" alt="" className="w-[26px] h-[21px]" />
                             </div>
@@ -175,7 +217,7 @@ const Task = () => {
                                 }
                             />
                         </Modal>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className="task-list mt-[27px]">
@@ -190,7 +232,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Join our TG channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 300</span>
+                                    <span className="text-[12px] leading-none">+ 1000</span>
                                 </div>
                             </div>
                         </div>
@@ -199,7 +241,7 @@ const Task = () => {
                             trigger={<button disabled={isJoinedTelegramChannel} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
                         >
                             <Placeholder
-                                header="Join our TG channel"
+                                header={<span className="text-black dark:text-white">Join our TG channel</span>}
                                 action={
                                     <Fragment>
                                         <Button onClick={handleTGChannelLink} size="m" stretched>Join</Button>
@@ -218,7 +260,7 @@ const Task = () => {
                                 <div className="text-[15px] leading-none">Join Twitter channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
                                     <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
-                                    <span className="text-[12px] leading-none">+ 300</span>
+                                    <span className="text-[12px] leading-none">+ 1000</span>
                                 </div>
                             </div>
                         </div>
@@ -227,7 +269,7 @@ const Task = () => {
                             trigger={<button disabled={isFollowingX} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
                         >
                             <Placeholder
-                                header="Join Twitter channel"
+                                header={<span className="text-black dark:text-white">Join Twitter channel</span>}
                                 action={
                                     <Fragment>
                                         <Button onClick={handleXLink} size="m" stretched>Join</Button>
@@ -255,7 +297,7 @@ const Task = () => {
                             trigger={<button disabled={isFollowingYouTube} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
                         >
                             <Placeholder
-                                header="Join Youtube channel"
+                                header={<span className="text-black dark:text-white">Join Youtube channel</span>}
                                 action={
                                     <Fragment>
                                         <Button onClick={handleYoutubeLink} size="m" stretched>Join</Button>

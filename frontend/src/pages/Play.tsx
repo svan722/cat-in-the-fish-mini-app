@@ -84,7 +84,7 @@ const Play = () => {
     }
 
     const clickFish = () => {
-        claimed.current++;
+        claimed.current += GAME[level].FISH;
     }
 
     const clickBomb = () => {

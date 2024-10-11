@@ -4,7 +4,7 @@ import { useInitData } from "@telegram-apps/sdk-react";
 import { toast } from "react-toastify";
 
 import API from "@/libs/API";
-import { OWNER_ADDRESS, IS_MAINNET } from "@/libs/constants";
+import { OWNER_ADDRESS, IS_MAINNET, PRICE } from "@/libs/constants";
 
 const Shop = () => {
     const initData = useInitData();
@@ -52,7 +52,7 @@ const Shop = () => {
 
     const handlePurchase = (type: "golden" | "super") => {
         if (wallet) {
-            const amount = type === "super" ? Math.pow(10, 9).toString() : (5 * Math.pow(10, 9)).toString();
+            const amount = type === "super" ? (PRICE.SUPER * Math.pow(10, 9)).toString() : (PRICE.GOLEN * Math.pow(10, 9)).toString();
             tonConnectUI.sendTransaction({
                 validUntil: Math.floor(Date.now() / 1000) + 60, // 60 sec
                 network: IS_MAINNET ? CHAIN.MAINNET : CHAIN.TESTNET,
@@ -105,9 +105,12 @@ const Shop = () => {
             <div className="">
                 <h1 className="text-[22px]">Get Items</h1>
                 <div className="mt-[10px] flex flex-col gap-[9px]">
-                    <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                    <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[5px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
-                            <img className="w-[48px] h-[48px]" src="/imgs/goldfish.png" alt="" />
+                            <div className="flex flex-col items-center gap-px">
+                                <img className="w-[48px] h-[48px]" src="/imgs/goldfish.png" alt="" />
+                                <span className="text-[10px]">{ PRICE.GOLEN } TON</span>
+                            </div>
                             <div className="flex flex-col justify-center gap-[6px]">
                                 <div className="text-[15px] leading-none">Golden Fish</div>
                                 <div className="text-[12px]">Auto fishing 10 fish</div>
@@ -115,9 +118,12 @@ const Shop = () => {
                         </div>
                         <button onClick={() => handlePurchase("golden")} className="bg-primary w-[120px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">{wallet ? 'Purchase' : 'Connect Wallet'}</button>
                     </div>
-                    <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                    <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[5px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
-                            <img className="w-[48px] h-[48px]" src="/imgs/rainbow.png" alt="" />
+                            <div className="flex flex-col items-center">
+                                <img className="w-[48px] h-[48px]" src="/imgs/rainbow.png" alt="" />
+                                <span className="text-[10px] -mt-px">{ PRICE.SUPER } TON</span>
+                            </div>
                             <div className="flex flex-col justify-center gap-[6px]">
                                 <div className="text-[15px] leading-none">Super Fish</div>
                                 <div className="text-[12px]">Auto fishing 50 fish</div>

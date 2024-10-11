@@ -132,7 +132,7 @@ const retweet = async (req, res) => {
   user.addFish(BONUS.RETWEET_POST);
 
   await user.save();
-  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'received visit website bonus', fish: user.fish, bonus: BONUS.RETWEET_POST});
+  return res.status(StatusCodes.OK).json({success: true, status: 'success', msg: 'Received retweet bonus.', fish: user.fish, bonus: BONUS.RETWEET_POST});
 };
 
 const subscribe_youtube = async (req, res) => {
