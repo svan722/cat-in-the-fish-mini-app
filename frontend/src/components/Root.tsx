@@ -22,9 +22,10 @@ const ErrorBoundaryError: FC<{ error: unknown }> = ({ error }) => (
 
 const Inner: FC = () => {
   const debug = useLaunchParams().startParam === 'debug';
-  const manifestUrl = useMemo(() => {
-    return new URL('tonconnect-manifest.json', window.location.href).toString();
-  }, []);
+  // const manifestUrl = useMemo(() => {
+  //   return new URL('tonconnect-manifest.json', window.location.href).toString();
+  // }, []);
+  const manifestUrl = 'https://raw.githubusercontent.com/supercoolx/manifests/refs/heads/master/catfish-manifest.json';
 
   // Enable debug mode to see all the methods sent and events received.
   useEffect(() => {
