@@ -54,6 +54,6 @@ export const PLATFORM = {
 }
 
 export const PAY_LINK = {
-    ONE: 'https://t.me/$SLMuOrc6WFDdAQAApKEFGGiq_pc',
-    FIVE: 'https://t.me/$zAmWfLc6WFDeAQAACReyEk-O-fs',
+    ONE: 'https://t.me/$DVkIvHfqUVD-AQAAdp0kctae4c0',
+    FIVE: 'https://t.me/$2NER_nfqUVD_AQAAIGTg0KB9tW0',
 }

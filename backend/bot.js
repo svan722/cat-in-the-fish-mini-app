@@ -71,6 +71,40 @@ const botStart = async () => {
         logger.info(`${ctx.from.first_name}#${ctx.from.id} command 'start'`);
     });
 
+    gameBot.command('getpayurl', async (ctx) => {
+        const title = "Golden Fish";
+        const description = "Use golden fish for auto fishing.";
+        const payload = "{}";
+        const currency = "XTR";
+        const prices = [{ amount: 1, label: "Gold Fish" }];
+        
+        const invoiceLink = await ctx.api.createInvoiceLink(
+            title,
+            description,
+            payload,
+            "", // Provider token must be empty for Telegram Stars
+            currency,
+            prices,
+        );
+        
+        const title2 = "Super Fish";
+        const description2 = "Use super fish for auto fishing.";
+        const payload2 = "{}";
+        const currency2 = "XTR";
+        const prices2 = [{ amount: 5, label: "Super Fish" }];
+        
+        const invoiceLink2 = await ctx.api.createInvoiceLink(
+            title2,
+            description2,
+            payload2,
+            "", // Provider token must be empty for Telegram Stars
+            currency2,
+            prices2,
+        );
+
+        await ctx.reply(invoiceLink + '\n' + invoiceLink2);
+    });
+
     (async () => {
         await gameBot.api.deleteWebhook();
         gameBot.start();
