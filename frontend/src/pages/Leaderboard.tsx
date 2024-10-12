@@ -34,7 +34,7 @@ const Leaderboard = () => {
     }, [])
     
     return (
-        <div className="w-screen h-screen px-[16px]">
+        <div className="w-screen h-screen px-[14px]">
             <h1 className="text-[40px] font-extrabold text-center text-[#F1F3B1]">Leaderboard</h1>
             <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[21px] flex justify-between items-center">
                 <div className="flex gap-[10px]">
@@ -50,7 +50,7 @@ const Leaderboard = () => {
                 <div>#{ selfRank }</div>
             </div>
             <h2 className="text-[20px] mt-[36px] mb-[20px]">{userCount} holders</h2>
-            <div className="h-[calc(100vh-330px)] overflow-y-auto flex flex-col gap-[28px]">
+            <div className="h-[calc(100vh-335px)] overflow-y-auto flex flex-col gap-[28px]">
                 {users.map((user, index) => 
                     <div key={index} className={`flex items-center justify-between pr-[20px]`}>
                         <div className="flex gap-[10px] items-center px-1">

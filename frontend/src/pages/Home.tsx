@@ -43,7 +43,7 @@ const Home = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-between w-screen h-screen py-[20px] px-[17px]">
+        <div className="flex flex-col items-center justify-between w-screen h-screen py-[20px] px-[14px]">
             <div className="flex items-center gap-[5px] mx-auto">
                 <button onClick={app?.toggleMusic} className={`w-[45px] h-[45px] border border-[#C6F0FF85] rounded-full bg-gradient-to-b from-[#38AFE3B0] to-[#1E94D3B0] flex items-center justify-center hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-200`}>
                     {app?.volume === "on" ? <img className="w-[27px] h-[27px]" src="/imgs/unmute.svg" alt="" /> : <img className="w-[27px] h-[27px]" src="/imgs/mute.svg" alt="" />}

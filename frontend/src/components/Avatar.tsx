@@ -10,11 +10,10 @@ export interface AvatarProps {
 
 const Avatar = ({ userid, width, className, height, username }: AvatarProps) => {
     return (
-        <div className="relative">
+        <div className="relative" style={{ width: width + 'px', height: height + 'px' }}>
             { username ?
-            <Link to={`https://t.me/${username}`}><img className={`rounded-full ${ className }`} src={`/api/v1/users/avatar/${userid}`}  alt="avatar" width={width} height={height} /></Link> :
-            <img className={`rounded-full ${ className }`} src={`/api/v1/users/avatar/${userid}`}  alt="avatar" width={width} height={height} /> }
-            {/* <img className="absolute bottom-0 right-0 translate-x-[4px] translate-y-[4px] rounded-[4px]" src="/imgs/ca.svg" alt="" /> */}
+            <Link to={`https://t.me/${username}`}><img className={`rounded-full ${ className }`} src={`/api/v1/users/avatar/${userid}`}  alt="avatar" loading="lazy" /></Link> :
+            <img className={`rounded-full ${ className }`} src={`/api/v1/users/avatar/${userid}`} loading="lazy" alt="avatar" /> }
         </div>
     );
 }
