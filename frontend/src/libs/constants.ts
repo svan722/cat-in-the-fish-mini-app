@@ -52,3 +52,8 @@ export const PLATFORM = {
     WEBSITE: 'Site',
     TWEET: 'Tweet'
 }
+
+export const PAY_LINK = {
+    ONE: 'https://t.me/$SLMuOrc6WFDdAQAApKEFGGiq_pc',
+    FIVE: 'https://t.me/$zAmWfLc6WFDeAQAACReyEk-O-fs',
+}

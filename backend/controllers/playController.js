@@ -6,6 +6,7 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/User');
 const Follow = require('../models/Follow');
 const BoostItem = require('../models/BoostItem');
+const History = require('../models/PayHistory');
 
 const logger = require('../helper/logger');
 const { BONUS, TELEGRAM, LEADERBOARD_SHOW_USER_COUNT } = require('../helper/constants');
@@ -71,6 +72,11 @@ const purchaseItems = async (req, res) => {
     user.super ++;
     await user.save();
   }
+  const history = new History({
+    user: user._id,
+    quantity: type === "super" ? 5 : (type === "golden" ? 1 : 0)
+  });
+  await history.save();
   return res.status(StatusCodes.OK).json({success: true, golden: user.golden, super: user.super});
 }
 const useItem = async (req, res) => {

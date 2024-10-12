@@ -28,6 +28,7 @@ export const App: FC = () => {
   const viewport = useViewport();
 
   useEffect(() => {
+    miniApp.setHeaderColor('#07A5FF');
     return bindMiniAppCSSVars(miniApp, themeParams);
   }, [miniApp, themeParams]);
 

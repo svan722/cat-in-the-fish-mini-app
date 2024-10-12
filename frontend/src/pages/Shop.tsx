@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { useTonWallet, useTonConnectUI, CHAIN } from '@tonconnect/ui-react';
-import { useInitData } from "@telegram-apps/sdk-react";
+import { useInitData, useInvoice } from "@telegram-apps/sdk-react";
 import { toast } from "react-toastify";
 
 import API from "@/libs/API";
-import { OWNER_ADDRESS, IS_MAINNET, PRICE } from "@/libs/constants";
+import { PRICE, PAY_LINK } from "@/libs/constants";
 
 const Shop = () => {
     const initData = useInitData();
-
-    const wallet = useTonWallet();
-    const [tonConnectUI,] = useTonConnectUI();
+    
+    const invoice = useInvoice();
 
     const [ticket, setTicket] = useState(0);
     const [fishes, setFishes] = useState(0);
@@ -25,13 +23,6 @@ const Shop = () => {
             setSuperFishes(res.data.super);
         }).catch(console.error);
     }, []);
-
-    useEffect(() => {
-        if (!wallet) return;
-        if (tonConnectUI.wallet?.account.chain !== CHAIN.MAINNET) {
-            toast.error("Please change your network to mainnet.");
-        }
-    }, [wallet]);
 
     const handleSwapClick = (fish: number) => {
         const yes = confirm('Are you sure?');
@@ -51,35 +42,26 @@ const Shop = () => {
     }
 
     const handlePurchase = (type: "golden" | "super") => {
-        if (wallet) {
-            const amount = type === "super" ? (PRICE.SUPER * Math.pow(10, 9)).toString() : (PRICE.GOLEN * Math.pow(10, 9)).toString();
-            tonConnectUI.sendTransaction({
-                validUntil: Math.floor(Date.now() / 1000) + 60, // 60 sec
-                network: IS_MAINNET ? CHAIN.MAINNET : CHAIN.TESTNET,
-                messages: [
-                    {
-                        address: OWNER_ADDRESS,
-                        amount: amount,
-                    }
-                ]
-            }).then(res => {
-                console.log('Transaction success:', res);
-                return API.post('users/play/purchase', { userid: initData?.user?.id, type });
-            }).then(res => {
-                if (res.data.success) {
-                    toast.success('Purchased successfully.');
-                    if (type === "golden") setGoldenFishes(res.data.golden);
-                    if (type === "super") setSuperFishes(res.data.super);
-                } else {
-                    toast.error(res.data.msg);
-                }
-            }).catch(err => {
+        const link = type === "super" ? PAY_LINK.FIVE : PAY_LINK.ONE; 
+        invoice.open(link, 'url').then(res => {
+            if (res === 'paid') {
+                API.post('/play/purchase', { userid: initData?.user?.id, type })
+                    .then(res => {
+                        if (res.data.success) {
+                            toast.success('Purchased successfully.');
+                            setGoldenFishes(res.data.golden);
+                            setSuperFishes(res.data.super);
+                        } else {
+                            toast.error(res.data.msg);
+                        }
+                    }).catch(err => {
+                        console.error(err);
+                        toast.error(err.message);
+                    });
+            } else {
                 toast.error('Something went wrong.');
-                console.error(err);
-            });
-        } else {
-            tonConnectUI.openModal();
-        }
+            }
+        });
     }
 
     return (
@@ -116,7 +98,7 @@ const Shop = () => {
                                 <div className="text-[12px]">Auto fishing 10 fish</div>
                             </div>
                         </div>
-                        <button onClick={() => handlePurchase("golden")} className="bg-primary w-[120px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">{wallet ? 'Purchase' : 'Connect Wallet'}</button>
+                        <button onClick={() => handlePurchase("golden")} className="bg-primary w-[120px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Purchase</button>
                     </div>
                     <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[5px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -129,7 +111,7 @@ const Shop = () => {
                                 <div className="text-[12px]">Auto fishing 50 fish</div>
                             </div>
                         </div>
-                        <button onClick={() => handlePurchase("super")} className="bg-primary w-[120px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">{wallet ? 'Purchase' : 'Connect Wallet'}</button>
+                        <button onClick={() => handlePurchase("super")} className="bg-primary w-[120px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Purchase</button>
                     </div>
                 </div>
             </div>
