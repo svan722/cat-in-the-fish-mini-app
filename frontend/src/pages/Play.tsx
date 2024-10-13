@@ -11,19 +11,20 @@ import Snow from "@/components/objects/Snow";
 import Bomb from "@/components/objects/Bomb";
 
 import API from "@/libs/API";
+// import { getCountByBoostId } from "@/libs/helper";
 import { GAME } from "@/libs/constants";
 
 import { Howl } from "howler";
 
 const Renderer = (props: CountdownRenderProps) => {
     return (
-        <span className="font-bold text-[20px]">{ props.minutes.toString().padStart(2, '0') } : { props.seconds.toString().padStart(2, '0') }</span>
+        <span className="font-bold text-[20px]">{props.minutes.toString().padStart(2, '0')} : {props.seconds.toString().padStart(2, '0')}</span>
     )
 }
 
 const Play = () => {
-    const superSound = new Howl({ src: ['/mp3/super.mp3'] });
-    const goldSound = new Howl({ src: ['/mp3/gold.mp3'] });
+    const rainbowSound = new Howl({ src: ['/mp3/rainbow_fish.mp3'] });
+    const goldenSound = new Howl({ src: ['/mp3/golden_fish.mp3'] });
     const snowSound = new Howl({ src: ['/mp3/freeze.mp3'] });
     const location = useLocation();
     const navigate = useNavigate();
@@ -39,11 +40,7 @@ const Play = () => {
     const [showGoldEffect, setShowGoldEffect] = useState(false);
     const [showSuperEffect, setShowSuperEffect] = useState(false);
 
-    const [goldenFish, setGoldenFish] = useState(false);
-    const [superFish, setSuperFish] = useState(false);
-    const [usedGolden, setUsedGolden] = useState(0);
-    const [usedSuper, setUsedSuper] = useState(false);
-
+    const [myBoosts, setMyBoosts] = useState<any[]>([]);
     const [counter, setCounter] = useState('3');
 
     const addObject = () => {
@@ -95,7 +92,7 @@ const Play = () => {
     }
 
     const clickSnow = () => {
-        snowSound.play(); 
+        snowSound.play();
         countdown.current.pause();
         timer.pause();
         setObjects(prev => prev.map(prev => ({ ...prev, status: "stopped" })));
@@ -117,7 +114,7 @@ const Play = () => {
         API.post('/play/fish', { userid: initData?.user?.id, fish: claimed.current })
             .then(res => {
                 if (res.data.success) {
-                    toast.success(`You got ${ claimed.current } fishes!`);
+                    toast.success(`You got ${claimed.current} fishes!`);
                     navigate('/home');
                     setEndTime(Date.now() + GAME[level].DURATION);
                     claimed.current = 0;
@@ -130,46 +127,48 @@ const Play = () => {
             });
     }
 
-    const handleGoldenFish = () => {
-        goldSound.play();
+    const handleUseFish = (boostid: string) => {
+        if (boostid == "golden_fish") {
+            goldenSound.play();
+            setShowGoldEffect(true);
+            claimed.current += 10;
+        } else if (boostid == "rainbow_fish") {
+            rainbowSound.play();
+            setShowSuperEffect(true);
+            claimed.current += 50;
+        }
+
+        setMyBoosts((prevBoosts) =>
+            prevBoosts.map((boost) => {
+                if (boost.item.boostid === boostid) {
+                    console.log(boost);
+                    return {
+                        ...boost,
+                        usedCount: boost.usedCount + 1,
+                    };
+                }
+                return boost;
+            })
+        );
+
         countdown.current.pause();
         timer.pause();
         setObjects([]);
-        claimed.current += 10;
-        setShowGoldEffect(true);
-        setUsedGolden(prev => prev + 1);
         setTimeout(() => {
             setShowGoldEffect(false);
-            timer.resume();
-            countdown.current.start();
-        }, 3000);
-
-        API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
-    }
-
-    const handleSuperFish = () => {
-        superSound.play();
-        countdown.current.pause();
-        timer.pause();
-        setObjects([]);
-        claimed.current += 50;
-        setShowSuperEffect(true);
-        setUsedSuper(true);
-        setTimeout(() => {
             setShowSuperEffect(false);
             timer.resume();
             countdown.current.start();
         }, 3000);
 
-        API.post('/play/useitem', { userid: initData?.user?.id, type: "super" }).catch(console.error);
+        API.post('/play/boost/use', { userid: initData?.user?.id, boostid }).catch(console.error);
     }
 
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
-            setGoldenFish(!!res.data.golden);
-            setSuperFish(!!res.data.super);
+            setMyBoosts(res.data.boosts);
         }).catch(console.error);
-        
+
         setTimeout(() => {
             setCounter('2');
             setTimeout(() => {
@@ -189,10 +188,10 @@ const Play = () => {
     return (
         <Fragment>
             <div className="flex items-center justify-center w-screen h-screen overflow-hidden">
-                { counter && <div className="absolute inset-0 flex items-center justify-center font-bold text-[150px]">{ counter }</div> }
-                { showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" /> }
-                { showGoldEffect && <div className="absolute inset-0 z-50 bg-yellow-500 animate-bomb" /> }
-                { showSuperEffect && <div className="absolute inset-0 z-50 [background:conic-gradient(red,yellow,green,cyan,blue,magenta,red)] animate-bomb" /> }
+                {counter && <div className="absolute inset-0 flex items-center justify-center font-bold text-[150px]">{counter}</div>}
+                {showBombEffect && <div className="absolute inset-0 bg-red-500 animate-bomb" />}
+                {showGoldEffect && <div className="absolute inset-0 z-50 bg-yellow-500 animate-bomb" />}
+                {showSuperEffect && <div className="absolute inset-0 z-50 [background:conic-gradient(red,yellow,green,cyan,blue,magenta,red)] animate-bomb" />}
                 <div className="absolute z-10 left-[29px] top-[29px] w-[107px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
                     <img className={`w-[19px] h-[19px] ${countdown.current?.isStarted() ? 'animate-spin' : 'animate-none'}`} src="/imgs/clock.svg" alt="" />
                     <Countdown ref={countdown} date={endTime} onComplete={handleGameOver} renderer={Renderer} autoStart={false} />
@@ -200,21 +199,27 @@ const Play = () => {
                 <div className="absolute z-10 right-[29px] top-[29px] flex flex-col items-center gap-2">
                     <div className="w-[60px] h-[46px] rounded-[10px] bg-primary flex items-center justify-center gap-[4px] border-b-2 border-dotted border-white">
                         <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
-                        <span className="font-bold text-[20px]">{ claimed.current }</span>
+                        <span className="font-bold text-[20px]">{claimed.current}</span>
                     </div>
-                    { goldenFish && (usedGolden < 2) && <button onClick={handleGoldenFish} className="relative w-[66px] h-[68px]">
-                        <img className="" src="/imgs/goldfish.png" alt="" />
-                        <span className="absolute bottom-0 right-0">x{2 - usedGolden}</span>
-                    </button> }
-                    { superFish && !usedSuper && <button onClick={handleSuperFish} className="w-[66px] h-[68px]">
-                        <img className="" src="/imgs/rainbow.png" alt="" />
-                    </button> }
+                    {myBoosts.map((boost, index) => {
+                        boost.usedCount = boost.usedCount ? boost.usedCount : 0;
+                        const aCount = Math.min(boost.usesRemaining, boost.item.maxUses) - boost.usedCount;
+                        if(aCount < 1) {
+                            return;
+                        }
+                        return (
+                            <button key={index} onClick={() => handleUseFish(boost.item.boostid)} className="relative w-[66px] h-[68px]">
+                                <img className="" src={`/imgs/${boost.item.logo}`} alt="" />
+                                {boost.item.maxUses > 1 && <span className="absolute bottom-0 right-0">x{aCount}</span>}
+                            </button>
+                        )
+                    })}
                 </div>
-                { objects.map((object, _) => {
+                {objects.map((object, _) => {
                     if (object.type === "fish") return <Fish key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
                     if (object.type === "bomb") return <Bomb key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
                     if (object.type === "snow") return <Snow key={object.id} left={object.left} status={object.status} fallTime={object.fallTime} callback={object.callback} />
-                }) }
+                })}
             </div>
         </Fragment>
     )

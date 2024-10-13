@@ -10,7 +10,7 @@ const History = require('../models/PayHistory');
 
 const logger = require('../helper/logger');
 const { BONUS, TELEGRAM, LEADERBOARD_SHOW_USER_COUNT } = require('../helper/constants');
-const { isUserTGJoined } = require('../helper/botHelper');
+const { isUserTGJoined, createInvoiceLink } = require('../helper/botHelper');
 
 const starFishing = async (req, res) => {
   const { userid } = req.body;
@@ -58,47 +58,105 @@ const addPlayedFish = async (req, res) => {
     await user.save();
     return res.status(StatusCodes.OK).json({success: true, ticket: user.ticket, fish: user.fish});
 }
-const purchaseItems = async (req, res) => {
-  const { userid, type } = req.body;
-  var user = await User.findOne({ userid });
+
+//boost
+const useBoost = async (req, res) => {
+  const { userid, boostid } = req.body;
+  var user = await User.findOne({ userid }).populate('boosts.item');
   if(!user) {
-    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no user!'});
+    return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'Not found user!'});
   }
-  if(type === "golden") {
-    user.golden ++;
-    await user.save();
+
+  const boost = user.boosts.find(b => b.item.boostid == boostid);
+  if (!boost || boost.usesRemaining <= 0) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'noboostitem', msg: 'Not found boost item!'});
   }
-  if(type === "super") {
-    user.super ++;
-    await user.save();
+
+  boost.usesRemaining -= 1;
+  if (boost.usesRemaining === 0) {
+    user.boosts = user.boosts.filter(b => b.item.boostid != boostid);
   }
-  const history = new History({
-    user: user._id,
-    quantity: type === "super" ? 5 : (type === "golden" ? 1 : 0)
-  });
-  await history.save();
-  return res.status(StatusCodes.OK).json({success: true, golden: user.golden, super: user.super});
+  await user.save();
+  
+  return res.status(StatusCodes.OK).json({success: true, msg: 'Use boost successfully!'});
 }
-const useItem = async (req, res) => {
-  const { userid, type } = req.body;
+const getAllBoost = async (req, res) => {
+  const boosts = await BoostItem.find({});
+  return res.status(StatusCodes.OK).json({boosts});
+}
+const addBoost = async (req, res) => {
+  const { boostid, title, description, logo, maxUses, price, bonus } = req.body;
+  const boostItem = await BoostItem.findOne({boostid});
+  if(boostItem) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'exist', msg: 'Boost name already exist!'});
+  }
+  await BoostItem.create({
+    boostid,
+    title,
+    description,
+    logo,
+    maxUses,
+    price,
+    bonus
+  });
+  return res.status(StatusCodes.OK).json({status: true, msg: 'Boost add success!'});
+}
+const getTotalBoostHistory = async (req, res) => {
+  const result = await BoostPurchaseHistory.aggregate([
+    {
+      $lookup: {
+        from: 'boostitems', // The name of the BoostItem collection
+        localField: 'boostItem',
+        foreignField: '_id',
+        as: 'boostDetails',
+      },
+    },
+    {
+      $unwind: '$boostDetails', // Unwind to access boost details
+    },
+    {
+      $group: {
+        _id: null,
+        totalUniqueUsers: { $addToSet: '$user' }, // Collect unique users
+        totalPrice: { $sum: { $multiply: ['$quantity', '$boostDetails.price'] } }, // Calculate total price
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalUniqueUsers: { $size: '$totalUniqueUsers' }, // Count unique users
+        totalPrice: 1, // Include total price
+      },
+    },
+  ]);
+  return res.status(StatusCodes.OK).json({success: true, result});
+}
+//star invoice
+const generateInvoice = async(req, res) => {
+  const {userid, boostid} = req.body;
   var user = await User.findOne({ userid });
   if(!user) {
     return res.status(StatusCodes.OK).json({success: false, status: 'nouser', msg: 'There is no user!'});
   }
-  if(type === "golden") {
-    user.golden --;
-    await user.save();
+  const boost = await BoostItem.findOne({boostid});
+  if(!boost) {
+    return res.status(StatusCodes.OK).json({success: false, status: 'noboost', msg: 'There is no boost item!'});
   }
-  if(type === "super") {
-    user.super --;
-    await user.save();
-  }
-  return res.status(StatusCodes.OK).json({success: true, golden: user.golden, super: user.super});
+
+  const paylog = { userid: user._id, boostid: boost._id };
+  const invoiceLink = await createInvoiceLink(boost.title, boost.description, JSON.stringify(paylog), boost.price);
+  console.log("invoiceLink=", invoiceLink);
+  return res.status(StatusCodes.OK).json({success: true, link: invoiceLink});
 }
 module.exports = {
     starFishing,
     swapTicket,
     addPlayedFish,
-    purchaseItems,
-    useItem,
+
+    useBoost,
+    getAllBoost,
+    addBoost,
+    getTotalBoostHistory,
+
+    generateInvoice,
 };

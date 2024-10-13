@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '../.env' });
-const { Bot, session,  InlineKeyboard } = require("grammy");
+const { Bot, session, InlineKeyboard } = require("grammy");
 const fs = require('fs');
 const download = require('download');
 
@@ -7,6 +7,10 @@ const download = require('download');
 const connectDB = require('./db/connect');
 const logger = require('./helper/logger');
 const userLogin = require('./utils/login');
+
+const User = require('./models/User');
+const BoostItem = require('./models/BoostItem');
+const BoostPurchaseHistory = require('./models/BoostPurchaseHistory');
 
 const botStart = async () => {
     await connectDB(process.env.MONGO_URL);
@@ -43,11 +47,11 @@ const botStart = async () => {
         const inviter = ctx.match;
 
         const loginRes = await userLogin(userid, username, firstname, lastname, isPremium, inviter);
-        if(!loginRes.success) {
+        if (!loginRes.success) {
             await ctx.reply("Sorry, seems like you don't have any telegram id, set your telegram id and try again.");
             return;
         }
-        
+
         play_url = process.env.APP_URL;
         const link = `${process.env.BOT_LINK}?startapp=${userid}`;
         const shareText = 'Join our telegram mini app.';
@@ -71,38 +75,64 @@ const botStart = async () => {
         logger.info(`${ctx.from.first_name}#${ctx.from.id} command 'start'`);
     });
 
-    gameBot.command('getpayurl', async (ctx) => {
-        const title = "Golden Fish";
-        const description = "Use golden fish for auto fishing.";
-        const payload = "{}";
-        const currency = "XTR";
-        const prices = [{ amount: 1, label: "Gold Fish" }];
-        
-        const invoiceLink = await ctx.api.createInvoiceLink(
-            title,
-            description,
-            payload,
-            "", // Provider token must be empty for Telegram Stars
-            currency,
-            prices,
-        );
-        
-        const title2 = "Super Fish";
-        const description2 = "Use super fish for auto fishing.";
-        const payload2 = "{}";
-        const currency2 = "XTR";
-        const prices2 = [{ amount: 5, label: "Super Fish" }];
-        
-        const invoiceLink2 = await ctx.api.createInvoiceLink(
-            title2,
-            description2,
-            payload2,
-            "", // Provider token must be empty for Telegram Stars
-            currency2,
-            prices2,
-        );
+    // gameBot.command("pay", (ctx) => {
+    //     return ctx.replyWithInvoice("Test Product", "Test description", "{}", "XTR", [
+    //         { amount: 1, label: "Test Product" },
+    //     ]);
+    // });
 
-        await ctx.reply(invoiceLink + '\n' + invoiceLink2);
+    gameBot.on("pre_checkout_query", (ctx) => {
+        return ctx.answerPreCheckoutQuery(true).catch(() => {
+            console.error("answerPreCheckoutQuery failed");
+        });
+    });
+
+    gameBot.on("message:successful_payment", async (ctx) => {
+
+        if (!ctx.message || !ctx.message.successful_payment || !ctx.from) {
+            return;
+        }
+
+        const payment = ctx.message.successful_payment;
+        const payload = JSON.parse(payment.invoice_payload);
+
+        await BoostPurchaseHistory.create({
+            user: payload.userid,
+            boostItem: payload.boostid,
+            telegramPaymentChargeId: payment.telegram_payment_charge_id,
+            providerPaymentChargeId: payment.provider_payment_charge_id,
+            payment: JSON.stringify(payment),
+        });
+
+        // Update user boosts
+        var user = await User.findById(payload.userid);
+        var boost = await BoostItem.findById(payload.boostid);
+        if(!user || !boost) {
+            console.log(`there is no boost(${payload.boostid}) or user(${payload.userid})`);
+            return;
+        }
+        const boostIndex = user.boosts.findIndex(b => b.item.equals(boost._id));
+        if (boostIndex !== -1) {
+            user.boosts[boostIndex].usesRemaining += boost.maxUses;
+        } else {
+            user.boosts.push({
+                item: boost._id,
+                usesRemaining: boost.maxUses,
+            });
+        }
+        await user.save();
+
+        console.log("successful_payment success=", ctx.message.successful_payment);
+    });
+
+    gameBot.command("refund", (ctx) => {
+        const userId = ctx.from.id;
+        ctx.api
+            .refundStarPayment(userId, 'stxcsVdegh_V9QU471o1mmMeSZHRxYXQRJqRrVFiO0HMHtLxuwi9208sA3Pj4AnsevtdSrZU4aXiOgpyryfaU3swHT4zGhahMTTDVBYyjWAKqr0OWMN227wix9ite7qmRYd')
+            .then(() => {
+                return ctx.reply("Refund successful");
+            })
+            .catch(() => ctx.reply("Refund failed"));
     });
 
     (async () => {
