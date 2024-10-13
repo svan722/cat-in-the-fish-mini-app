@@ -6,7 +6,6 @@ const { StatusCodes } = require('http-status-codes');
 const User = require('../models/User');
 const Follow = require('../models/Follow');
 const BoostItem = require('../models/BoostItem');
-const History = require('../models/PayHistory');
 
 const logger = require('../helper/logger');
 const { BONUS, TELEGRAM, LEADERBOARD_SHOW_USER_COUNT } = require('../helper/constants');
