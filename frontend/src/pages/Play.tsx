@@ -49,16 +49,18 @@ const Play = () => {
         for (let i = 0; i < GAME[level].GOLD_COUNT; i++) {
             const delay = Math.random() * (GAME[level].DURATION / GAME[level].GOLD_COUNT) + (i * (GAME[level].DURATION / GAME[level].GOLD_COUNT)); // Spread the calls over time
             setTimeout(() => {
-                const newObject: ObjectInfo = {
-                    id: Date.now(),
-                    type: "gold",
-                    left: Math.random() * 100,
-                    status: "falling",
-                    fallTime: GAME[level].FALL_TIME,
-                    callback: () => clickFish(GAME[level].GOLD_POINT)
-                }
-                setObjects(prev => [...prev, newObject]);
-                setTimeout(removeObject, GAME[level].FALL_TIME + 2 * GAME[level].FROZEN_TIME, newObject.id);
+                setTimeout(() => {
+                    const newObject: ObjectInfo = {
+                        id: Date.now(),
+                        type: "gold",
+                        left: Math.random() * 100,
+                        status: "falling",
+                        fallTime: GAME[level].FALL_TIME,
+                        callback: () => clickFish(GAME[level].GOLD_POINT)
+                    }
+                    setObjects(prev => [...prev, newObject]);
+                    setTimeout(removeObject, GAME[level].FALL_TIME + 2 * GAME[level].FROZEN_TIME, newObject.id);
+                }, timer.isRunning() ? 0 : GAME[level].FROZEN_TIME);
             }, delay);
         }
     }
@@ -126,8 +128,8 @@ const Play = () => {
 
     const clickBomb = () => {
         setShowBombEffect(true);
-        if (claimed.current > 10) claimed.current += GAME[level].BOMB_POINT;
-        else claimed.current = 0;
+        claimed.current += GAME[level].BOMB_POINT;
+        if (claimed.current < 0) claimed.current = 0;
         setTimeout(setShowBombEffect, 3000, false);
     }
 
