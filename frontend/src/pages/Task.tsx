@@ -4,7 +4,7 @@ import { useTonWallet, useTonConnectModal } from '@tonconnect/ui-react';
 import { toast } from 'react-toastify';
 import Countdown from 'react-countdown';
 
-import { Modal, Placeholder, Button } from '@telegram-apps/telegram-ui';
+import Button from '@/components/Button';
 import API from '@/libs/API';
 import { LINK, PLATFORM } from '@/libs/constants';
 import { Link } from '@/components/Link';
@@ -24,6 +24,10 @@ const Task = () => {
     const [dailyReward, setDailyReward] = useState(1000);
     const [isRetweetX, setRetweetX] = useState(false);
     const [isConnectedWallet, setConnectedWallet] = useState(false);
+
+    const [showRetweetModal, setShowRetweetModal] = useState(false);
+    const [showJoinTGChannelModal, setShowJoinTGChannelModal] = useState(false);
+    const [showFollowXModal, setShowFollowXModal] = useState(false);
 
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
@@ -146,7 +150,7 @@ const Task = () => {
         if (isConnectedWallet) return;
         if (wallet) {
             API.post(`/users/connect_wallet`, { userid: initData?.user?.id }).then(res => {
-                if(res.data.success) {
+                if (res.data.success) {
                     setConnectedWallet(true);
                     toast.success(res.data.msg);
                 } else toast.error(res.data.msg);
@@ -196,20 +200,7 @@ const Task = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Modal
-                                header={<Modal.Header />}
-                                trigger={<button disabled={isRetweetX} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                            >
-                                <Placeholder
-                                    header="Retweet our blog"
-                                    action={
-                                        <Fragment>
-                                            <Button onClick={handleRetweekLink} size="m" stretched>Retweet</Button>
-                                            <Button onClick={handleRetweetX} size="m" stretched>Complete</Button>
-                                        </Fragment>
-                                    }
-                                />
-                            </Modal>
+                            <button disabled={isRetweetX} onClick={() => setShowRetweetModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                         </div>
                         {/* <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -257,7 +248,7 @@ const Task = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button disabled={isConnectedWallet} onClick={handleConnectWallet} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">{ isConnectedWallet ? 'Connected' : (wallet ? 'Redeem' : 'Connect') }</button>
+                            <button disabled={isConnectedWallet} onClick={handleConnectWallet} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">{isConnectedWallet ? 'Connected' : (wallet ? 'Redeem' : 'Connect')}</button>
                         </div>
                         <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                             <div className="flex gap-[10px]">
@@ -272,20 +263,7 @@ const Task = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Modal
-                                header={<Modal.Header />}
-                                trigger={<button disabled={isJoinedTelegramChannel} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                            >
-                                <Placeholder
-                                    header={<span className="text-black dark:text-white">Join our TG channel</span>}
-                                    action={
-                                        <Fragment>
-                                            <Button onClick={handleTGChannelLink} size="m" stretched>Join</Button>
-                                            <Button onClick={handleJoinTelegramChannel} size="m" stretched>Complete</Button>
-                                        </Fragment>
-                                    }
-                                />
-                            </Modal>
+                            <button disabled={isJoinedTelegramChannel} onClick={() => setShowJoinTGChannelModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                         </div>
                         <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                             <div className="flex gap-[10px]">
@@ -300,20 +278,7 @@ const Task = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Modal
-                                header={<Modal.Header />}
-                                trigger={<button disabled={isFollowingX} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                            >
-                                <Placeholder
-                                    header={<span className="text-black dark:text-white">Join Twitter channel</span>}
-                                    action={
-                                        <Fragment>
-                                            <Button onClick={handleXLink} size="m" stretched>Join</Button>
-                                            <Button onClick={handleFollowX} size="m" stretched>Complete</Button>
-                                        </Fragment>
-                                    }
-                                />
-                            </Modal>
+                            <button disabled={isFollowingX} onClick={() => setShowFollowXModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                         </div>
                         {/*<div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                         <div className="flex gap-[10px]">
@@ -396,6 +361,33 @@ const Task = () => {
                     <span className="text-[10px] group-hover:text-primary leading-none transition-all duration-200">FRIEND</span>
                 </Link>
             </div>
+            { showRetweetModal && <div onClick={() => setShowRetweetModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Retweet our blog</h1>
+                    </div>
+                    <Button onClick={handleRetweekLink} height={36}>RETWEET</Button>
+                    <Button onClick={handleRetweetX} height={36}>COMPLETE</Button>
+                </div>
+            </div> }
+            { showJoinTGChannelModal && <div onClick={() => setShowJoinTGChannelModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Join our TG channel</h1>
+                    </div>
+                    <Button onClick={handleTGChannelLink} height={36}>JOIN</Button>
+                    <Button onClick={handleJoinTelegramChannel} height={36}>COMPLETE</Button>
+                </div>
+            </div> }
+            { showFollowXModal && <div onClick={() => setShowFollowXModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Join Twitter channel</h1>
+                    </div>
+                    <Button onClick={handleXLink} height={36}>JOIN</Button>
+                    <Button onClick={handleFollowX} height={36}>COMPLETE</Button>
+                </div>
+            </div> }
         </div>
     )
 }

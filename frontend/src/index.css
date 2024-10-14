@@ -39,3 +39,28 @@ body {
         transform: translate(-50%, 100vh);
     }
 }
+
+:root{
+    --toastify-color-success: #fff;
+    --toastify-color-error: #e74c3c;
+    --toastify-color-dark: #07A5FF;
+}
+
+@media only screen and (max-width: 480px) {
+    .Toastify__toast{
+        border-radius: 10px;
+    }
+}
+
+.Toastify__toast{
+    margin: 10px 10px 0 10px;
+}
+
+.Toastify__toast > .Toastify__toast-body > * {
+    color: var(--toastify-icon-color-success);
+}
+
+.Toastify__toast.Toastify__toast--error > .Toastify__toast-body > * {
+    color: var(--toastify-icon-color-error);
+    font-weight: bold;
+}

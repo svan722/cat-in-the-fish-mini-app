@@ -31,8 +31,7 @@ const Shop = () => {
     }, []);
 
     const handleSwapClick = (fish: number) => {
-        const yes = confirm('Are you sure?');
-        if (yes) API.post('/play/swap', { userid: initData?.user?.id, fish })
+        API.post('/play/swap', { userid: initData?.user?.id, fish })
             .then(res => {
                 if (res.data.success) {
                     toast.success('You got tickets.');
