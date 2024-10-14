@@ -68,7 +68,7 @@ const botStart = async () => {
         await ctx.replyWithPhoto(
             process.env.BOT_LOGO,
             {
-                caption: 'welcome to cat fish',
+                caption: '🐾 Cat in the Fish – Dive into an Underwater Adventure with Your Cat! 🐟\n\rYour mission is simple: catch as many fish as possible to collect points and convert them into coins! But it\'s not that easy. 🐾 The more fish you catch, the bigger the rewards! 🎣\n\r\n\r🌟 How to Play\n\r\n\rTap to catch the fish!\n\rEach fish gives you points.\n\rCollected points can be converted into coins that will be issued! 💰\n\rWays to Make the Game Even More Fun!\n\r🎯 Play with friends! – Invite your friends and enjoy fishing together while earning more points.\n\r🎁 Follow us on Twitter for extra rewards! – Just follow us on Twitter to unlock special bonuses!\n\r🚀 Share the game to get even bigger rewards! – Spread the word and watch your rewards grow as more people join!\n\r\n\rJoin "Cat in the Fish" now, catch fish, and claim the best rewards! 🏆',
                 reply_markup: keyboard,
             }
         );
