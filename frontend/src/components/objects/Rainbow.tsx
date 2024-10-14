@@ -18,7 +18,7 @@ const RainbowFish = ({ left, callback, status, fallTime }: ObjectProps) => {
         left: `${left}%`,
         animationPlayState: status === "stopped" ? "paused" : "running"
     }}>
-        <img draggable={false} className="animate-spin" style={{ animationPlayState: status === "stopped" ? "paused" : "running" }} src="/imgs/rainbow.png" alt="" />
+        <img draggable={false} className="animate-spin" style={{ animationPlayState: status === "stopped" ? "paused" : "running" }} src="/imgs/rainbow-fish.png" alt="" />
     </div>
 }
 

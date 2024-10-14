@@ -18,7 +18,7 @@ const GoldFish = ({ left, callback, status, fallTime }: ObjectProps) => {
         left: `${left}%`,
         animationPlayState: status === "stopped" ? "paused" : "running"
     }}>
-        <img draggable={false} className="animate-spin" style={{ animationPlayState: status === "stopped" ? "paused" : "running" }} src="/imgs/goldfish.png" alt="" />
+        <img draggable={false} className="animate-spin" style={{ animationPlayState: status === "stopped" ? "paused" : "running" }} src="/imgs/gold-fish.png" alt="" />
     </div>
 }
 
