@@ -1,6 +1,6 @@
 import { SDKProvider, useLaunchParams } from '@telegram-apps/sdk-react';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 
 import { App } from '@/components/App.tsx';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
@@ -26,13 +26,6 @@ const Inner: FC = () => {
   //   return new URL('tonconnect-manifest.json', window.location.href).toString();
   // }, []);
   const manifestUrl = 'https://raw.githubusercontent.com/supercoolx/manifests/refs/heads/master/catfish-manifest.json';
-
-  // Enable debug mode to see all the methods sent and events received.
-  useEffect(() => {
-    if (debug) {
-      import('eruda').then((lib) => lib.default.init());
-    }
-  }, [debug]);
 
   return (
     <TonConnectUIProvider manifestUrl={manifestUrl}>

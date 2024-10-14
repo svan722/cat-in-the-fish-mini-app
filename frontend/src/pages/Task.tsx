@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect } from 'react';
 import { useInitData, useUtils } from "@telegram-apps/sdk-react";
 import { useTonWallet, useTonConnectModal } from '@tonconnect/ui-react';
 import { toast } from 'react-toastify';

@@ -5,6 +5,9 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    chunkSizeWarningLimit: 800
+  },
   base: '/',
   plugins: [
     // Allows using React dev server along with building a React application with Vite.
