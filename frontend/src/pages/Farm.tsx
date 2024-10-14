@@ -11,8 +11,8 @@ const Farm = () => {
                 <p className="mt-[16px] text-center text-[16px] leading-none">At the end of each season, a percentage of<br />the token supply will be distributed<br />among all players</p>
                 <div className="flex justify-center items-center mt-[32px] gap-[4px] mb-[20px]">
                     <button className="flex items-center justify-center gap-[6px] w-[112px] h-[30px] rounded-[10px] border border-dotted border-[#FFDC8D] bg-[#C49F4A]">
-                        <img className="w-[21px] h-[21px]" src="/imgs/fish.png" alt="" />
-                        <span className="text-[10px] leading-none">Fish x Player</span>
+                        <img className="w-[18px] h-[18px]" src="/imgs/coin.png" alt="" />
+                        <span className="text-[10px] leading-none">Coin x Player</span>
                     </button>
                     <img className="w-[17px] h-[17px]" src="/imgs/equal.svg" alt="" />
                     <button className="flex items-center justify-center gap-[6px] w-[84px] h-[30px] rounded-[10px] border border-dotted border-[#73E3FC] bg-[#07A5FF]">

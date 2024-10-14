@@ -1,4 +1,4 @@
-export type ObjectType = "fish" | "bomb" | "snow";
+export type ObjectType = "fish" | "gold" | "rainbow" | "bomb" | "snow";
 export type ObjectStatus = "falling" | "stopped";
 
 export type Level = "easy" | "medium" | "hard";

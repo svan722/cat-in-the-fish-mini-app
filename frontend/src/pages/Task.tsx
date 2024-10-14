@@ -174,7 +174,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Daily reward</div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ {dailyReward}</span>
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Retweet our blog</div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ 1000</span>
                                     </div>
                                 </div>
@@ -210,7 +210,7 @@ const Task = () => {
                             <div className="flex flex-col justify-center gap-[6px]">
                                 <div className="text-[15px] leading-none">Follow TG Chat</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                    <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                    <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                     <span className="text-[12px] leading-none">+ 250</span>
                                 </div>
                             </div>
@@ -243,7 +243,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Connect Wallet</div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ 1000</span>
                                     </div>
                                 </div>
@@ -258,7 +258,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Join our TG channel</div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ 1000</span>
                                     </div>
                                 </div>
@@ -273,7 +273,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Join Twitter channel</div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ 1000</span>
                                     </div>
                                 </div>
@@ -288,7 +288,7 @@ const Task = () => {
                             <div className="flex flex-col justify-center gap-[6px]">
                                 <div className="text-[15px] leading-none">Join Youtube channel</div>
                                 <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                    <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                    <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                     <span className="text-[12px] leading-none">+ 20</span>
                                 </div>
                             </div>
@@ -316,7 +316,7 @@ const Task = () => {
                                 <div className="flex flex-col justify-center gap-[6px]">
                                     <div className="text-[15px] leading-none">Invite 5 Friends </div>
                                     <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                         <span className="text-[12px] leading-none">+ 5,000</span>
                                     </div>
                                 </div>

@@ -43,7 +43,7 @@ const Leaderboard = () => {
                         <div className="text-[15px] leading-none">{ self.firstname }</div>
                         <div className="flex justify-center items-center gap-[5px]">
                             <span className="text-[12px] leading-none">{ self.fish?.toLocaleString() }</span>
-                            <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                            <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ const Leaderboard = () => {
                                 <div className={`text-[15px] leading-none w-[200px] overflow-hidden text-ellipsis whitespace-nowrap ${selfRank === index + 1 ? 'text-yellow-300' : ''}`}>{ user.firstname }</div>
                                 <div className="flex justify-center items-center gap-[5px]">
                                     <span className="text-[12px] leading-none">{ user.fish.toLocaleString() }</span>
-                                    <img src="/imgs/fish.png" alt="" className="w-[19px] h-[19px]" />
+                                    <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
                                 </div>
                             </div>
                         </div>

@@ -56,8 +56,8 @@ const Invite = () => {
                             <div className="w-[6px] h-[6px] bg-white rounded-full"></div>
                             <div className="flex items-center">
                                 <span>1 friends =</span>
-                                <div className="ml-[6px] flex gap-[3px] items-center justify-center w-[53px] h-[13px] bg-[#C49F4A] rounded-[3px] border-[0.5px] border-dotted border-[#FFD471]">
-                                    <img className="w-[13px] h-[13px]" src="/imgs/fish.png" alt="" />
+                                <div className="ml-[6px] flex gap-[3px] items-center justify-center w-[53px] h-[16px] bg-[#C49F4A] rounded-[3px] border-[0.5px] border-dotted border-[#FFD471]">
+                                    <img className="w-[13px] h-[13px]" src="/imgs/coin.png" alt="" />
                                     <span className="text-[11px]">1000</span>
                                 </div>
                             </div>
