@@ -1,29 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useInitData, useUtils } from "@telegram-apps/sdk-react";
-import { useTonWallet, useTonConnectModal } from '@tonconnect/ui-react';
+import { useTonWallet, useTonConnectModal, useTonAddress } from '@tonconnect/ui-react';
 import { toast } from 'react-toastify';
 import Countdown from 'react-countdown';
 
 import Button from '@/components/Button';
 import API from '@/libs/API';
-import { LINK, PLATFORM } from '@/libs/constants';
 import { Link } from '@/components/Link';
 
 const Task = () => {
     const initData = useInitData();
     const utils = useUtils();
+    const wallet_address = useTonAddress();
     const wallet = useTonWallet();
     const { open } = useTonConnectModal();
 
+    
+    const [referrals, setReferrals] = useState<any[]>([]);
+    const [myReferrals, setMyReferrals] = useState<any[]>([]);
+
     const [dailyRemainSecond, setDailyRemainSecond] = useState(0);
-    // const [isJoinedTelegramGroup, setJoinedTelegramGroup] = useState(false);
-    const [isJoinedTelegramChannel, setJoinedTelegramChannel] = useState(false);
-    // const [isFollowingYouTube, setFollowingYouTube] = useState(false);
-    const [isFollowingX, setFollowingX] = useState(false);
-    const [isInviteFive, setInviteFive] = useState(false);
     const [dailyReward, setDailyReward] = useState(1000);
-    const [isRetweetX, setRetweetX] = useState(false);
-    const [isConnectedWallet, setConnectedWallet] = useState(false);
+
+    const [isInviteFive, setInviteFive] = useState(false);
 
     const [showRetweetModal, setShowRetweetModal] = useState(false);
     const [showJoinTGChannelModal, setShowJoinTGChannelModal] = useState(false);
@@ -31,17 +30,21 @@ const Task = () => {
 
     useEffect(() => {
         API.get(`/users/get/${initData?.user?.id}`).then(res => {
-            setFollowingX(res.data.xFollowed);
-            setRetweetX(res.data.xTweet);
-            // setFollowingYouTube(res.data.youtubeSubscribed);
-            setJoinedTelegramChannel(res.data.telegramChannelJoined);
-            // setJoinedTelegramGroup(res.data.telegramGroupJoined);
             setInviteFive(res.data.inviteFive);
-            setConnectedWallet(res.data.walletConnected);
         }).catch(console.error);
+
+        API.get('/users/task/getall').then(res => {
+            setReferrals(res.data.referrals);
+        }).catch(console.log);
+
+        getMyTaskList();
         handleClaimDailyReward();
     }, [initData]);
-
+    const getMyTaskList = () => {
+        API.get(`/users/task/getmy/${initData?.user?.id}`).then(res => {
+            setMyReferrals(res.data.myReferrals);
+        }).catch(console.log);
+    }
     const handleClaimDailyReward = (status = 0) => {
         API.post(`/users/claim/daily`, { userid: initData?.user?.id, status }).then(res => {
             if (res.data.success) {
@@ -56,86 +59,6 @@ const Task = () => {
         }).catch(console.error);
     }
 
-    // const handleJoinTelegramGroup = () => {
-    //     API.post('/users/jointg', {
-    //         userid: initData?.user?.id,
-    //         type: 'group'
-    //     }).then(res => {
-    //         if(res.data.success) {
-    //             setJoinedTelegramGroup(true);
-    //             toast.success(res.data.msg);
-    //         }
-    //         else toast.error(res.data.msg);
-    //     }).catch(console.error);
-    // }
-
-    const handleJoinTelegramChannel = () => {
-        API.post('/users/jointg', {
-            userid: initData?.user?.id,
-            type: 'channel'
-        }).then(res => {
-            if (res.data.success) {
-                setJoinedTelegramChannel(true);
-                toast.success(res.data.msg);
-            }
-            else toast.error(res.data.msg);
-        }).catch(console.error);
-    }
-
-    const handleFollowX = () => {
-        API.post('/users/followx', { userid: initData?.user?.id, username: initData?.user?.username }).then(res => {
-            if (res.data.success) {
-                setFollowingX(true);
-                toast.success(res.data.msg);
-            }
-            else toast.error(res.data.msg);
-        }).catch(console.error);
-    }
-
-    const handleRetweetX = () => {
-        API.post('/users/tweet', { userid: initData?.user?.id, username: initData?.user?.username }).then(res => {
-            if (res.data.success) {
-                setRetweetX(true);
-                toast.success(res.data.msg);
-            }
-            else toast.error(res.data.msg);
-        }).catch(err => console.error(err));
-    }
-
-    // const handleFollowYoutube = () => {
-    //     API.post('/users/subscribe_youtube', { userid:initData?.user?.id, username: initData?.user?.username }).then(res => {
-    //         if(res.data.success) {
-    //             setFollowingYouTube(true);
-    //             // setOpenRetweetXModal(false);
-    //             toast.success(res.data.msg);
-    //         }
-    //         else toast.error(res.data.msg);
-    //     }).catch(console.error);
-    // }
-
-    // const handleTGGroupLink = () => {
-    //     utils.openTelegramLink(LINK.TELEGRAM_GROUP);
-    // }
-
-    const handleTGChannelLink = () => {
-        utils.openTelegramLink(LINK.TELEGRAM_CHANNEL);
-    }
-
-    const handleXLink = () => {
-        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.X }).catch(console.error);
-        utils.openLink(LINK.X);
-    }
-
-    const handleRetweekLink = () => {
-        API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.TWEET }).catch(console.error);
-        utils.openLink(LINK.TWEET);
-    }
-
-    // const handleYoutubeLink = () => {
-    //     API.post('/users/follow', { userid: initData?.user?.id, platform: PLATFORM.YOUTUBE }).catch(console.error);
-    //     utils.openLink(LINK.YOUTUBE);
-    // }
-
     const handleInviteFiveFriends = () => {
         API.post('/users/invite/task', { userid: initData?.user?.id, count: 5 }).then(res => {
             if (res.data.success) {
@@ -146,20 +69,132 @@ const Task = () => {
         }).catch(console.error);
     }
 
-    const handleConnectWallet = () => {
-        if (isConnectedWallet) return;
-        if (wallet) {
-            API.post(`/users/connect_wallet`, { userid: initData?.user?.id }).then(res => {
-                if (res.data.success) {
-                    setConnectedWallet(true);
-                    toast.success(res.data.msg);
-                } else toast.error(res.data.msg);
-            }).catch(console.error)
-        } else {
-            open();
+    const handlePartner = (referral: any, myReferral: any) => {
+        if(myReferral && myReferral.finished) {
+            return;
+        }
+        if(referral.type == 'partner_tg_channel' || referral.type == 'partner_tg_bot') {
+            utils.openTelegramLink(referral.url);
+        } else if(referral.type == 'partner_social') {
+            utils.openLink(referral.url);
+        }
+        
+        API.post(`/users/task/do`, { userid: initData?.user?.id, linkid: referral.linkid }).then(() => {
+            myRefferalTaskCheck(referral.linkid);
+        }).catch(console.error)
+    }
+    const handleMyRefferalLink = (linkid: string) => {
+        const myReferral = myReferrals.find(ref => ref.item.linkid === linkid);
+        if(myReferral && myReferral.finished) {
+            return;
+        }
+
+        if(linkid == 'wallet') {
+            if(wallet) {
+                myRefferalTaskCheck(linkid, wallet_address);
+                return;
+            } else {
+                open();
+                myRefferalTaskDo(linkid);
+            }
+        } else if(linkid == 'catfish_tg_channel') {
+            setShowJoinTGChannelModal(true);
+        } else if(linkid == 'catfish_x_follow') {
+            setShowFollowXModal(true);
+        } else if(linkid == 'catfish_x_retweet') {
+            setShowRetweetModal(true);
         }
     }
+    const myRefferalTaskDo = (linkid: string) => {
+        API.post(`/users/task/do`, { userid: initData?.user?.id, linkid }).catch(console.error)
+    }
+    const myRefferalTaskCheck = (linkid: string, payload = '') => {
+        API.post(`/users/task/check`, { userid: initData?.user?.id, linkid, payload }).then(res => {
+            if (res.data.success) {
+                getMyTaskList();
+                toast.success(res.data.msg);
+            } else toast.error(res.data.msg);
+        }).catch(console.error)
+    }
+    const myReferralComponent = (linkid: string, btnTitle = "Reddem") => {
+        const referral = referrals.find(ref => ref.linkid === linkid);
+        if(!referral) {
+            return '';
+        }
+        const myReferral = myReferrals.find(ref => ref.item.linkid === linkid);
 
+        if(linkid == 'wallet') {
+            if(myReferral && myReferral.finished) {
+                btnTitle = "Connected";
+            } else if(!wallet) {
+                btnTitle = "Connect";
+            }
+        }
+        return (
+            <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                <div className="flex gap-[10px]">
+                    <div className="w-[48px] h-[48px] rounded-[8px] bg-[#272B2F] flex justify-center items-center">
+                        <img src={`/imgs/${referral.logo}`} alt="" className="w-[26px] h-[24px]" />
+                    </div>
+                    <div className="flex flex-col justify-center gap-[6px]">
+                        <div className="text-[15px] leading-none">{referral.title}</div>
+                        <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                            <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
+                            <span className="text-[12px] leading-none">+ {referral.bonus.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+                <button disabled={myReferral && myReferral.finished} onClick={() => handleMyRefferalLink(linkid)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">{btnTitle}</button>
+            </div>
+        );
+    }
+
+    //dailog
+    const ChannelDialog = () => {
+        const linkid = 'catfish_tg_channel';
+        const referral = referrals.find(ref => ref.linkid === linkid);
+        return (
+            <div onClick={() => setShowJoinTGChannelModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Join our TG channel</h1>
+                    </div>
+                    <Button onClick={()=> {utils.openTelegramLink(referral.url); myRefferalTaskDo(linkid);}} height={36}>JOIN</Button>
+                    <Button onClick={()=> {myRefferalTaskCheck(linkid);}} height={36}>COMPLETE</Button>
+                </div>
+            </div>
+        );
+    }
+    const FollowXDialog = () => {
+        const linkid = 'catfish_x_follow';
+        const referral = referrals.find(ref => ref.linkid === linkid);
+        return (
+            <div onClick={() => setShowFollowXModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Join Twitter channel</h1>
+                    </div>
+                    <Button onClick={()=> {utils.openLink(referral.url); myRefferalTaskDo(linkid);}} height={36}>JOIN</Button>
+                    <Button onClick={()=> {myRefferalTaskCheck(linkid);}} height={36}>COMPLETE</Button>
+                </div>
+            </div>
+        )
+    }
+    const RetweetXDialog = () => {
+        const linkid = 'catfish_x_retweet';
+        const referral = referrals.find(ref => ref.linkid === linkid);
+        return (
+            <div onClick={() => setShowRetweetModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
+                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
+                    <div className="leading-tight">
+                        <h1 className="font-semibold text-[24px] text-center">Retweet our blog</h1>
+                    </div>
+                    <Button onClick={()=> {utils.openLink(referral.url); myRefferalTaskDo(linkid);}} height={36}>RETWEET</Button>
+                    <Button onClick={()=> {myRefferalTaskCheck(linkid);}} height={36}>COMPLETE</Button>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="pt-[16px] px-[14px] pb-[20px]">
             <div className="h-[calc(100vh-135px)] overflow-y-auto">
@@ -187,127 +222,18 @@ const Task = () => {
                                     <button onClick={() => handleClaimDailyReward(1)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100">Check now</button>
                             }
                         </div>
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <div className="w-[48px] h-[48px] rounded-[8px] bg-[#272B2F] flex justify-center items-center">
-                                    <img src="/imgs/x-icon.svg" alt="" className="w-[26px] h-[24px]" />
-                                </div>
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Retweet our blog</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button disabled={isRetweetX} onClick={() => setShowRetweetModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
-                        </div>
-                        {/* <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                        <div className="flex gap-[10px]">
-                            <div className="w-[48px] h-[48px] rounded-[8px] bg-[#2DA9E6] flex justify-center items-center">
-                                <img src="/imgs/tg-icon.svg" alt="" className="w-[26px] h-[21px]" />
-                            </div>
-                            <div className="flex flex-col justify-center gap-[6px]">
-                                <div className="text-[15px] leading-none">Follow TG Chat</div>
-                                <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                    <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                    <span className="text-[12px] leading-none">+ 250</span>
-                                </div>
-                            </div>
-                        </div>
-                        <Modal
-                            header={<Modal.Header />}
-                            trigger={<button disabled={isJoinedTelegramGroup} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                        >
-                            <Placeholder
-                                header="Follow TG Chat"
-                                action={
-                                    <Fragment>
-                                        <Button onClick={handleTGGroupLink} size="m" stretched>Follow</Button>
-                                        <Button onClick={handleJoinTelegramGroup} size="m" stretched>Check now</Button>
-                                    </Fragment>
-                                }
-                            />
-                        </Modal>
-                    </div> */}
+                        { myReferralComponent('catfish_x_retweet') }
+                        {showRetweetModal && <RetweetXDialog />}
                     </div>
                 </div>
                 <div className="task-list mt-[27px]">
                     <h1 className="text-[17px]">Task List</h1>
                     <div className="mt-[16px] flex flex-col gap-[9px]">
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <div className="w-[48px] h-[48px] rounded-[8px] bg-[#2DA9E6] flex justify-center items-center">
-                                    <img src="/imgs/wallet.svg" alt="" className="w-[26px] h-[21px]" />
-                                </div>
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Connect Wallet</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button disabled={isConnectedWallet} onClick={handleConnectWallet} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">{isConnectedWallet ? 'Connected' : (wallet ? 'Redeem' : 'Connect')}</button>
-                        </div>
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <div className="w-[48px] h-[48px] rounded-[8px] bg-[#2DA9E6] flex justify-center items-center">
-                                    <img src="/imgs/tg-icon.svg" alt="" className="w-[26px] h-[21px]" />
-                                </div>
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Join our TG channel</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button disabled={isJoinedTelegramChannel} onClick={() => setShowJoinTGChannelModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
-                        </div>
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <div className="w-[48px] h-[48px] rounded-[8px] bg-[#272B2F] flex justify-center items-center">
-                                    <img src="/imgs/x-icon.svg" alt="" className="w-[26px] h-[24px]" />
-                                </div>
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Join Twitter channel</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button disabled={isFollowingX} onClick={() => setShowFollowXModal(true)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
-                        </div>
-                        {/*<div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                        <div className="flex gap-[10px]">
-                            <div className="w-[48px] h-[48px] rounded-[8px] bg-[#FC0301] flex justify-center items-center">
-                                <img src="/imgs/play.svg" alt="" className="w-[16px] h-[16px]" />
-                            </div>
-                            <div className="flex flex-col justify-center gap-[6px]">
-                                <div className="text-[15px] leading-none">Join Youtube channel</div>
-                                <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                    <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                    <span className="text-[12px] leading-none">+ 20</span>
-                                </div>
-                            </div>
-                        </div>
-                        <Modal
-                            header={<Modal.Header />}
-                            trigger={<button disabled={isFollowingYouTube} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>}
-                        >
-                            <Placeholder
-                                header={<span className="text-black dark:text-white">Join Youtube channel</span>}
-                                action={
-                                    <Fragment>
-                                        <Button onClick={handleYoutubeLink} size="m" stretched>Join</Button>
-                                        <Button onClick={handleFollowYoutube} size="m" stretched>Complete</Button>
-                                    </Fragment>
-                                }
-                            />
-                        </Modal>
-                    </div>*/}
+                        { myReferralComponent('wallet') }
+                        { myReferralComponent('catfish_tg_channel') }
+                        {showJoinTGChannelModal && <ChannelDialog />}
+                        { myReferralComponent('catfish_x_follow') }
+                        {showFollowXModal && <FollowXDialog />}
                         <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
                             <div className="flex gap-[10px]">
                                 <div className="w-[48px] h-[48px] rounded-[8px] bg-[#0C0C0D] flex justify-center items-center">
@@ -328,37 +254,49 @@ const Task = () => {
                 <div className="task-list mt-[27px]">
                     <h1 className="text-[17px]">Partner Channel</h1>
                     <div className="mt-[16px] flex flex-col gap-[9px]">
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <img src="/imgs/referral/mole-channel.jpg" alt="" className="w-[48px] h-[48px] rounded-[8px]" />
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Mole Smash</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
+                        {
+                            referrals.filter((referral) => referral.type === 'partner_tg_channel' || referral.type === 'partner_social').map((referral, index) => {
+                                const myReferral = myReferrals.find(ref => ref.item.linkid === referral.linkid);
+                                return (
+                                <div key={index} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                                    <div className="flex gap-[10px]">
+                                        <img src={`/imgs/referral/${referral.logo}`} alt="" className="w-[48px] h-[48px] rounded-[8px]" />
+                                        <div className="flex flex-col justify-center gap-[6px]">
+                                            <div className="text-[15px] leading-none">{referral.title}</div>
+                                            <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                                                <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
+                                                <span className="text-[12px] leading-none">+ {referral.bonus.toLocaleString()}</span>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <button disabled={myReferral && myReferral.finished} onClick={() => handlePartner(referral, myReferral)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                                 </div>
-                            </div>
-                            <button disabled={false} onClick={() => {}} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
-                        </div>
+                            )})
+                        }
                     </div>
                 </div>
                 <div className="task-list mt-[27px]">
                     <h1 className="text-[17px]">Partner Project</h1>
                     <div className="mt-[16px] flex flex-col gap-[9px]">
-                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
-                            <div className="flex gap-[10px]">
-                                <img src="/imgs/referral/mole-channel.jpg" alt="" className="w-[48px] h-[48px] rounded-[8px]" />
-                                <div className="flex flex-col justify-center gap-[6px]">
-                                    <div className="text-[15px] leading-none">Mole Smash</div>
-                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
-                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
-                                        <span className="text-[12px] leading-none">+ 1000</span>
+                        {
+                            referrals.filter((referral) => referral.type === 'partner_tg_bot').map((referral, index) => {
+                                const myReferral = myReferrals.find(ref => ref.item.linkid === referral.linkid);
+                                return (
+                                <div key={index} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                                    <div className="flex gap-[10px]">
+                                        <img src={`/imgs/referral/${referral.logo}`} alt="" className="w-[48px] h-[48px] rounded-[8px]" />
+                                        <div className="flex flex-col justify-center gap-[6px]">
+                                            <div className="text-[15px] leading-none">{referral.title}</div>
+                                            <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                                                <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
+                                                <span className="text-[12px] leading-none">+ {referral.bonus.toLocaleString()}</span>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <button disabled={myReferral && myReferral.finished} onClick={() => handlePartner(referral, myReferral)} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
                                 </div>
-                            </div>
-                            <button disabled={false} onClick={() => {}} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
-                        </div>
+                            )})
+                        }
                     </div>
                 </div>
             </div>
@@ -397,33 +335,6 @@ const Task = () => {
                     <span className="text-[10px] group-hover:text-primary leading-none transition-all duration-200">FRIEND</span>
                 </Link>
             </div>
-            { showRetweetModal && <div onClick={() => setShowRetweetModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
-                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
-                    <div className="leading-tight">
-                        <h1 className="font-semibold text-[24px] text-center">Retweet our blog</h1>
-                    </div>
-                    <Button onClick={handleRetweekLink} height={36}>RETWEET</Button>
-                    <Button onClick={handleRetweetX} height={36}>COMPLETE</Button>
-                </div>
-            </div> }
-            { showJoinTGChannelModal && <div onClick={() => setShowJoinTGChannelModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
-                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
-                    <div className="leading-tight">
-                        <h1 className="font-semibold text-[24px] text-center">Join our TG channel</h1>
-                    </div>
-                    <Button onClick={handleTGChannelLink} height={36}>JOIN</Button>
-                    <Button onClick={handleJoinTelegramChannel} height={36}>COMPLETE</Button>
-                </div>
-            </div> }
-            { showFollowXModal && <div onClick={() => setShowFollowXModal(false)} className="fixed inset-0 z-10 flex items-center justify-center w-screen h-screen backdrop-blur-md">
-                <div onClick={e => e.stopPropagation()} className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] px-[17px] py-[19px] w-[300px] h-[180px] flex flex-col justify-between">
-                    <div className="leading-tight">
-                        <h1 className="font-semibold text-[24px] text-center">Join Twitter channel</h1>
-                    </div>
-                    <Button onClick={handleXLink} height={36}>JOIN</Button>
-                    <Button onClick={handleFollowX} height={36}>COMPLETE</Button>
-                </div>
-            </div> }
         </div>
     )
 }

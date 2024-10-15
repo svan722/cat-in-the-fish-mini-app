@@ -1,11 +1,11 @@
 export const LINK = {
     TELEGRAM_MINIAPP: 'https://t.me/CatInTheFishBot/play',
-    TELEGRAM_GROUP: 'https://t.me/tapps_bot',
+    // TELEGRAM_GROUP: 'https://t.me/tapps_bot',
     TELEGRAM_CHANNEL: 'https://t.me/Catinthefish',
-    X: 'https://x.com/CatInTheFish?t=p9OEN2s6HczzGOlhMc2xyw&s=09',
-    YOUTUBE: 'https://youtube.com/@test',
-    WEBSITE: 'https://test.xyz/',
-    TWEET: 'https://x.com/tapp?t=w9mTEnT0h7M7zzj9ki4jpw&s=09',
+    // X: 'https://x.com/CatInTheFish?t=p9OEN2s6HczzGOlhMc2xyw&s=09',
+    // YOUTUBE: 'https://youtube.com/@test',
+    // WEBSITE: 'https://test.xyz/',
+    // TWEET: 'https://x.com/tapp?t=w9mTEnT0h7M7zzj9ki4jpw&s=09',
     MANIFEST: 'https://supercoolx.github.io/manifests/catfish-manifest.json',
 }
 
