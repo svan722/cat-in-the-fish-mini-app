@@ -57,7 +57,8 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
         const audio = new Howl({
             src: ['/mp3/background.mp3'],
             autoplay: true,
-            loop: true
+            loop: true,
+            preload: true
         });
 
         audio.play();
