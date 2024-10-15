@@ -2,24 +2,29 @@ import { Fragment, useEffect, useState } from "react";
 import { useInitData } from "@telegram-apps/sdk-react";
 
 import API from "@/libs/API";
-import { LINK } from "@/libs/constants";
 import { Link } from "@/components/Link";
 
 const Splash = ({ onClick }: { onClick: () => void }) => {
     const [showJoinChannel, setShowJoinChannel] = useState(false);
+    const [referral, setReferral] = useState<any>(null);
+
+    const LINKID = 'catfish_tg_channel';
     const initData = useInitData();
+
     useEffect(() => {
         const style = document.body.style.background;
         document.body.style.background = "none";
 
-        API.post('/users/jointg', {
-            userid: initData?.user?.id,
-            type: 'channel'
-        }).then(res => {
-            if (res.data.status === "notyet") {
+        API.get(`/users/task/getmy/${initData?.user?.id}`).then(res => {
+            const reff = res.data.myReferrals.find((ref: any) => ref.item.linkid === LINKID);
+            if(!reff) {
                 setShowJoinChannel(true);
             }
-        }).catch(console.error);
+        }).catch(console.log);
+        API.get('/users/task/getall').then(res => {
+            const reff = res.data.referrals.find((ref: any) => ref.linkid === LINKID);
+            setReferral(reff);
+        }).catch(console.log);
 
         return () => {
             document.body.style.background = style;
@@ -29,6 +34,10 @@ const Splash = ({ onClick }: { onClick: () => void }) => {
     const handleModal = (e: any) => {
         e.stopPropagation();
         e.preventDefault();
+        // setShowJoinChannel(false);
+    }
+    const handleSubscribeTGChannel = () => {
+        API.post(`/users/task/do`, { userid: initData?.user?.id, linkid: LINKID }).catch(console.error)
         setShowJoinChannel(false);
     }
 
@@ -43,7 +52,7 @@ const Splash = ({ onClick }: { onClick: () => void }) => {
                 </div>
                 <h1 className="mt-[20px] text-[40px] text-secondary font-extrabold leading-none text-center">TELEGRAM CHANNEL</h1>
                 <p className="mt-[16px] mb-[20px] text-center text-[16px]">Subscribe to Telegram:<br />To farm bananas and complete tasks</p>
-                <Link to={LINK.TELEGRAM_CHANNEL} className="rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100 outline-none h-12 w-[299px]">Subscribe Telegram Channel</Link>
+                <Link to={referral?.url} onClick={handleSubscribeTGChannel} className="rounded-[10px] flex justify-center items-center bg-primary border-b-2 box-content border-[#C6F0FF] text-[20px] hover:-translate-y-1 hover:active:translate-y-0 transition-all duration-100 outline-none h-12 w-[299px]">Subscribe Telegram Channel</Link>
             </div>
         </div> }
     </Fragment>

@@ -58,7 +58,8 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
             src: ['/mp3/background.mp3'],
             autoplay: true,
             loop: true,
-            preload: true
+            preload: true,
+            volume: 0.8
         });
 
         audio.play();
