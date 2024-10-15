@@ -7,11 +7,16 @@ const CHANNEL_ID = '-1002153654987'; //macro
 
 module.exports.isUserTGJoined = (userId, channelId = CHANNEL_ID) => bot.getChatMember(channelId, userId)
 .then((chatMember) => {
-    if (chatMember.status === 'member' || chatMember.status === 'creator' || chatMember.status === 'administrator') {
-        logger.info(`isUserTGJoined User#${userId} is a ${chatMember.status} of the channel.`,);
-        return true;
-    } else {
-        logger.info(`isUserTGJoined User#${userId} is not a member of the channel.`);
+    try {
+        if (chatMember.status === 'member' || chatMember.status === 'creator' || chatMember.status === 'administrator') {
+            logger.info(`isUserTGJoined User#${userId} is a ${chatMember.status} of the channel.`,);
+            return true;
+        } else {
+            logger.info(`isUserTGJoined User#${userId} is not a member of the channel.`);
+            return false;
+        }
+    } catch(error) {
+        console.log("isuserTgJoined error=", error);
         return false;
     }
 })
