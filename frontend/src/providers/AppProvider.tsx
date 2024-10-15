@@ -61,6 +61,16 @@ const AppProvider = ({ children }: { children: JSX.Element }) => {
         });
 
         audio.play();
+
+        const handleVisibilityChange = () => {
+            Howler.mute(document.hidden);
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            audio.unload();
+        }
     }, []);
 
     return (
