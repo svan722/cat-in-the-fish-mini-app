@@ -325,6 +325,42 @@ const Task = () => {
                         </div>
                     </div>
                 </div>
+                <div className="task-list mt-[27px]">
+                    <h1 className="text-[17px]">Partner Channel</h1>
+                    <div className="mt-[16px] flex flex-col gap-[9px]">
+                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                            <div className="flex gap-[10px]">
+                                <img src="/imgs/referral/mole-channel.jpg" alt="" className="w-[48px] h-[48px] rounded-[8px]" />
+                                <div className="flex flex-col justify-center gap-[6px]">
+                                    <div className="text-[15px] leading-none">Mole Smash</div>
+                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
+                                        <span className="text-[12px] leading-none">+ 1000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button disabled={false} onClick={() => {}} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
+                        </div>
+                    </div>
+                </div>
+                <div className="task-list mt-[27px]">
+                    <h1 className="text-[17px]">Partner Project</h1>
+                    <div className="mt-[16px] flex flex-col gap-[9px]">
+                        <div className="bg-[#8AA6B7B2] backdrop-blur-md rounded-[5px] pl-[20px] py-[15px] pr-[8px] flex justify-between items-center">
+                            <div className="flex gap-[10px]">
+                                <img src="/imgs/referral/mole-channel.jpg" alt="" className="w-[48px] h-[48px] rounded-[8px]" />
+                                <div className="flex flex-col justify-center gap-[6px]">
+                                    <div className="text-[15px] leading-none">Mole Smash</div>
+                                    <div className="bg-primary rounded-full w-[94px] h-[21px] flex justify-center items-center gap-[5px]">
+                                        <img src="/imgs/coin.png" alt="" className="w-[15px] h-[15px]" />
+                                        <span className="text-[12px] leading-none">+ 1000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button disabled={false} onClick={() => {}} className="bg-primary w-[95px] h-[36px] rounded-[5px] text-[14px] hover:-translate-y-1 hover:drop-shadow-md hover:active:translate-y-0 hover:active:drop-shadow-none transition-all duration-100 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:drop-shadow-none disabled:bg-white disabled:text-primary">Complete</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className="mt-[20px] w-full h-[79px] grid grid-cols-4 items-center justify-center px-[20px] rounded-[16px] bg-[#8AA6B799] backdrop-blur-md">
                 <Link to="/" className="flex flex-col items-center gap-[4px] group hover:stroke-primary stroke-white transition-all duration-200 hover:scale-125 hover:active:scale-100">
